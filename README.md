@@ -40,6 +40,12 @@ uv pip install paper-siphon[mlx]
 
 ## Usage
 
+### Quick start (no install)
+
+```bash
+uvx paper-siphon paper.pdf                # Run directly with uvx
+```
+
 ### Basic
 
 ```bash
