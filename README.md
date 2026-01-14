@@ -62,25 +62,6 @@ paper-siphon --no-mlx --vlm paper.pdf     # VLM without MLX acceleration
 paper-siphon -v paper.pdf                 # Verbose logging
 ```
 
-### Python API
-
-```python
-from paper_siphon import clean_markdown
-
-raw_text = """001
-002
-## Introduction
-003
-Some text here.
-"""
-
-cleaned = clean_markdown(raw_text)
-print(cleaned)
-# ## Introduction
-#
-# Some text here.
-```
-
 ## How It Works
 
 Paper Siphon uses [Docling](https://github.com/DS4SD/docling) for PDF parsing, then applies
