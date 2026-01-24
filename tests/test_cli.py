@@ -1,10 +1,12 @@
 """Tests for Paper Siphon CLI."""
 
+from unittest.mock import patch
+
 import pytest
 from click.testing import CliRunner
 
 from paper_siphon import LINE_NUMBER_PATTERN, clean_markdown
-from paper_siphon.cli import main
+from paper_siphon.cli import is_url, main, resolve_source
 
 
 @pytest.fixture
@@ -138,7 +140,7 @@ class TestCLIValidation:
     def test_rejects_nonexistent_file(self, cli_runner: CliRunner) -> None:
         result = cli_runner.invoke(main, ["/nonexistent/path/file.pdf"])
         assert result.exit_code != 0
-        assert "does not exist" in result.output.lower()
+        assert "not found" in result.output.lower()
 
 
 class TestCLIConversion:
@@ -159,3 +161,88 @@ class TestCLIConversion:
         if result.exit_code == 0:
             assert output_file.exists()
             assert "Done!" in result.output
+
+
+# --- URL support tests ---
+
+
+class TestIsUrl:
+    """Tests for URL detection."""
+
+    @pytest.mark.parametrize(
+        "url",
+        [
+            "https://arxiv.org/pdf/2301.00001.pdf",
+            "http://example.com/paper.pdf",
+            "https://example.com/path/to/file.pdf",
+        ],
+    )
+    def test_detects_urls(self, url: str) -> None:
+        assert is_url(url) is True
+
+    @pytest.mark.parametrize(
+        "path",
+        [
+            "/path/to/file.pdf",
+            "relative/path.pdf",
+            "file.pdf",
+            "./paper.pdf",
+            "../paper.pdf",
+        ],
+    )
+    def test_detects_local_paths(self, path: str) -> None:
+        assert is_url(path) is False
+
+
+class TestResolveSource:
+    """Tests for source resolution."""
+
+    def test_resolves_local_file(self, tmp_path) -> None:
+        test_file = tmp_path / "test.pdf"
+        test_file.write_text("content")
+
+        with resolve_source(str(test_file)) as (path, filename):
+            assert path == test_file
+            assert filename == "test.pdf"
+
+    def test_raises_for_nonexistent_file(self) -> None:
+        with pytest.raises(Exception) as exc_info:
+            with resolve_source("/nonexistent/file.pdf"):
+                pass
+        assert "not found" in str(exc_info.value).lower()
+
+    def test_downloads_url(self, tmp_path) -> None:
+        url = "https://example.com/paper.pdf"
+
+        def mock_urlretrieve(url, path):
+            path.write_text("mock pdf content")
+
+        with patch("paper_siphon.cli.urllib.request.urlretrieve", mock_urlretrieve):
+            with resolve_source(url) as (path, filename):
+                assert path.exists()
+                assert filename == "paper.pdf"
+                assert path.read_text() == "mock pdf content"
+
+    def test_url_temp_file_cleaned_up(self, tmp_path) -> None:
+        url = "https://example.com/paper.pdf"
+        temp_path = None
+
+        def mock_urlretrieve(url, path):
+            path.write_text("mock content")
+
+        with patch("paper_siphon.cli.urllib.request.urlretrieve", mock_urlretrieve):
+            with resolve_source(url) as (path, filename):
+                temp_path = path
+                assert temp_path.exists()
+
+        assert not temp_path.exists()
+
+    def test_extracts_filename_from_url(self) -> None:
+        url = "https://arxiv.org/pdf/2301.00001.pdf"
+
+        def mock_urlretrieve(url, path):
+            path.write_text("content")
+
+        with patch("paper_siphon.cli.urllib.request.urlretrieve", mock_urlretrieve):
+            with resolve_source(url) as (path, filename):
+                assert filename == "2301.00001.pdf"

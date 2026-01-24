@@ -3,7 +3,11 @@
 import logging
 import platform
 import sys
+import tempfile
+import urllib.request
+from contextlib import contextmanager
 from pathlib import Path
+from urllib.parse import urlparse
 
 import click
 
@@ -22,6 +26,36 @@ from paper_siphon.cleaning import clean_markdown
 logger = logging.getLogger(__name__)
 
 MLX_AVAILABLE = platform.system() == "Darwin" and platform.machine() == "arm64"
+
+
+def is_url(source: str) -> bool:
+    """Check if source is a URL."""
+    parsed = urlparse(source)
+    return parsed.scheme in ("http", "https")
+
+
+@contextmanager
+def resolve_source(source: str):
+    """Resolve source to a local file path, downloading if URL.
+
+    Yields (path, filename) where filename is used for default output naming.
+    """
+    if is_url(source):
+        parsed = urlparse(source)
+        filename = Path(parsed.path).name or "paper.pdf"
+        click.echo(f"Downloading {source}")
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+            tmp_path = Path(tmp.name)
+        try:
+            urllib.request.urlretrieve(source, tmp_path)
+            yield tmp_path, filename
+        finally:
+            tmp_path.unlink(missing_ok=True)
+    else:
+        path = Path(source)
+        if not path.exists():
+            raise click.ClickException(f"File not found: {source}")
+        yield path, path.name
 
 
 def create_standard_converter(enrich_formula: bool) -> DocumentConverter:
@@ -77,7 +111,7 @@ def create_vlm_converter(use_mlx: bool, enrich_formula: bool) -> DocumentConvert
 
 
 @click.command()
-@click.argument("file", type=click.Path(exists=True, path_type=Path))
+@click.argument("source")
 @click.option(
     "-o",
     "--output",
@@ -109,7 +143,7 @@ def create_vlm_converter(use_mlx: bool, enrich_formula: bool) -> DocumentConvert
     help="Enable verbose logging.",
 )
 def main(
-    file: Path,
+    source: str,
     output: Path | None,
     vlm: bool,
     mlx: bool,
@@ -117,6 +151,8 @@ def main(
     verbose: bool,
 ) -> None:
     """Siphon clean Markdown from academic PDFs.
+
+    SOURCE can be a local file path or a URL to a PDF.
 
     Extracts content from academic papers, automatically removing line numbers
     and cleaning up formatting artifacts.
@@ -126,41 +162,41 @@ def main(
         paper-siphon paper.pdf
         paper-siphon paper.pdf -o notes.md
         paper-siphon --vlm paper.pdf
-        paper-siphon --enrich-formula paper.pdf
     """
     logging.basicConfig(
         level=logging.DEBUG if verbose else logging.WARNING,
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
 
-    if output is None:
-        output = file.with_suffix(".md")
+    with resolve_source(source) as (file_path, filename):
+        if output is None:
+            output = Path(filename).with_suffix(".md")
 
-    click.echo(f"Converting {file} -> {output}")
+        click.echo(f"Converting {source} -> {output}")
 
-    try:
-        if vlm:
-            mode = "VLM + MLX" if mlx else "VLM + CPU"
-            click.echo(f"Using {mode} pipeline")
-            converter = create_vlm_converter(use_mlx=mlx, enrich_formula=enrich_formula)
-        else:
-            click.echo("Using standard pipeline (accurate table mode)")
-            converter = create_standard_converter(enrich_formula=enrich_formula)
+        try:
+            if vlm:
+                mode = "VLM + MLX" if mlx else "VLM + CPU"
+                click.echo(f"Using {mode} pipeline")
+                converter = create_vlm_converter(use_mlx=mlx, enrich_formula=enrich_formula)
+            else:
+                click.echo("Using standard pipeline (accurate table mode)")
+                converter = create_standard_converter(enrich_formula=enrich_formula)
 
-        result = converter.convert(file)
-    except (ImportError, RuntimeError) as e:
-        click.echo(f"Error: {e}", err=True)
-        sys.exit(1)
-    except Exception as e:
-        logger.exception("Conversion failed")
-        click.echo(f"Error: Conversion failed - {e}", err=True)
-        sys.exit(1)
+            result = converter.convert(file_path)
+        except (ImportError, RuntimeError) as e:
+            click.echo(f"Error: {e}", err=True)
+            sys.exit(1)
+        except Exception as e:
+            logger.exception("Conversion failed")
+            click.echo(f"Error: Conversion failed - {e}", err=True)
+            sys.exit(1)
 
-    markdown = result.document.export_to_markdown()
-    cleaned = clean_markdown(markdown)
+        markdown = result.document.export_to_markdown()
+        cleaned = clean_markdown(markdown)
 
-    output.write_text(cleaned)
-    click.echo(f"Done! Output saved to {output}")
+        output.write_text(cleaned)
+        click.echo(f"Done! Output saved to {output}")
 
 
 if __name__ == "__main__":
