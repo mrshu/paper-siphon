@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- URL support: download and convert PDFs directly from URLs
+- Show help text when invoked with no arguments
+
+### Fixed
+
+- arXiv-style filenames (e.g., `1706.03762`) now produce correct output (`1706.03762.md` instead of `1706.md`)
+
 ## [0.1.0] - 2025-01-14
 
 ### Added
