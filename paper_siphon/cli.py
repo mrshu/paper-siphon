@@ -178,7 +178,12 @@ def main(
     Examples:
         paper-siphon paper.pdf
         paper-siphon paper.pdf -o notes.md
+        paper-siphon https://arxiv.org/pdf/1706.03762.pdf
         paper-siphon --vlm paper.pdf
+
+    \b
+    Tip: For arXiv papers, just change /abs/ to /pdf/ in the URL:
+        https://arxiv.org/abs/1706.03762  ->  https://arxiv.org/pdf/1706.03762.pdf
     """
     if source is None:
         click.echo(ctx.get_help())

@@ -53,6 +53,19 @@ paper-siphon paper.pdf                    # Creates paper.md
 paper-siphon paper.pdf -o notes.md        # Custom output path
 ```
 
+### From URL (including arXiv)
+
+```bash
+paper-siphon https://arxiv.org/pdf/1706.03762.pdf
+```
+
+**Tip:** For arXiv papers, just change `/abs/` to `/pdf/` in the URL:
+```
+https://arxiv.org/abs/1706.03762  →  https://arxiv.org/pdf/1706.03762.pdf
+```
+
+(That's "Attention Is All You Need" - the Transformer paper)
+
 ### Advanced
 
 ```bash
