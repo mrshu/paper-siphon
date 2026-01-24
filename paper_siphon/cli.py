@@ -126,6 +126,7 @@ def create_vlm_converter(use_mlx: bool, enrich_formula: bool) -> DocumentConvert
 
 
 @click.command()
+@click.version_option(package_name="paper-siphon")
 @click.argument("source", required=False)
 @click.pass_context
 @click.option(
