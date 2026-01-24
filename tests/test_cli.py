@@ -6,7 +6,7 @@ import pytest
 from click.testing import CliRunner
 
 from paper_siphon import LINE_NUMBER_PATTERN, clean_markdown
-from paper_siphon.cli import is_url, main, resolve_source
+from paper_siphon.cli import is_url, main, resolve_source, to_markdown_filename
 
 
 @pytest.fixture
@@ -246,3 +246,23 @@ class TestResolveSource:
         with patch("paper_siphon.cli.urllib.request.urlretrieve", mock_urlretrieve):
             with resolve_source(url) as (path, filename):
                 assert filename == "2301.00001.pdf"
+
+
+class TestToMarkdownFilename:
+    """Tests for output filename generation."""
+
+    def test_regular_pdf_extension(self) -> None:
+        assert str(to_markdown_filename("paper.pdf")) == "paper.md"
+
+    def test_arxiv_style_id(self) -> None:
+        # arXiv IDs like 1706.03762 should not treat .03762 as extension
+        assert str(to_markdown_filename("1706.03762")) == "1706.03762.md"
+
+    def test_arxiv_style_with_pdf(self) -> None:
+        assert str(to_markdown_filename("1706.03762.pdf")) == "1706.03762.md"
+
+    def test_no_extension(self) -> None:
+        assert str(to_markdown_filename("paper")) == "paper.md"
+
+    def test_other_extension(self) -> None:
+        assert str(to_markdown_filename("document.txt")) == "document.md"

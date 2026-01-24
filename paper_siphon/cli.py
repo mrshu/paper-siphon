@@ -34,6 +34,21 @@ def is_url(source: str) -> bool:
     return parsed.scheme in ("http", "https")
 
 
+def to_markdown_filename(filename: str) -> Path:
+    """Convert a filename to .md output path.
+
+    Handles arXiv-style IDs like '1706.03762' where the dot is not a file extension.
+    """
+    path = Path(filename)
+    suffix = path.suffix
+
+    # If suffix looks like a number (e.g., .03762), it's not a real extension
+    if suffix and suffix[1:].isdigit():
+        return Path(filename + ".md")
+
+    return path.with_suffix(".md")
+
+
 @contextmanager
 def resolve_source(source: str):
     """Resolve source to a local file path, downloading if URL.
@@ -170,7 +185,7 @@ def main(
 
     with resolve_source(source) as (file_path, filename):
         if output is None:
-            output = Path(filename).with_suffix(".md")
+            output = to_markdown_filename(filename)
 
         click.echo(f"Converting {source} -> {output}")
 
