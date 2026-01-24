@@ -126,7 +126,8 @@ def create_vlm_converter(use_mlx: bool, enrich_formula: bool) -> DocumentConvert
 
 
 @click.command()
-@click.argument("source")
+@click.argument("source", required=False)
+@click.pass_context
 @click.option(
     "-o",
     "--output",
@@ -158,7 +159,8 @@ def create_vlm_converter(use_mlx: bool, enrich_formula: bool) -> DocumentConvert
     help="Enable verbose logging.",
 )
 def main(
-    source: str,
+    ctx: click.Context,
+    source: str | None,
     output: Path | None,
     vlm: bool,
     mlx: bool,
@@ -178,6 +180,10 @@ def main(
         paper-siphon paper.pdf -o notes.md
         paper-siphon --vlm paper.pdf
     """
+    if source is None:
+        click.echo(ctx.get_help())
+        return
+
     logging.basicConfig(
         level=logging.DEBUG if verbose else logging.WARNING,
         format="%(asctime)s - %(levelname)s - %(message)s",

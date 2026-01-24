@@ -132,10 +132,11 @@ class TestCLIHelp:
 class TestCLIValidation:
     """Tests for CLI argument validation."""
 
-    def test_requires_file_argument(self, cli_runner: CliRunner) -> None:
+    def test_shows_help_with_no_arguments(self, cli_runner: CliRunner) -> None:
         result = cli_runner.invoke(main, [])
-        assert result.exit_code != 0
-        assert "Missing argument" in result.output
+        assert result.exit_code == 0
+        assert "Usage:" in result.output
+        assert "Siphon clean Markdown" in result.output
 
     def test_rejects_nonexistent_file(self, cli_runner: CliRunner) -> None:
         result = cli_runner.invoke(main, ["/nonexistent/path/file.pdf"])
