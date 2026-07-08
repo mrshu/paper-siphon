@@ -1,0 +1,46 @@
+# paper-siphon backend benchmark corpus — all public URLs, reproducible.
+# Core = PDFs actually run through paper-siphon (from shell history).
+# Expansion = public arXiv papers chosen for axis coverage.
+papers:
+  - id: ssl_2025_first_order
+    url: https://ssl.robocup.org/wp-content/uploads/2025/04/2025_TDP_First-Order.pdf
+    tags: [real-run, multi-column, tables, engineering]
+  - id: ssl_2025_the_bots
+    url: https://ssl.robocup.org/wp-content/uploads/2025/04/2025_TDP_The-Bots.pdf
+    tags: [real-run, multi-column, engineering]
+  - id: ssl_2020_zjunlict
+    url: https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_ZJUNlict.pdf
+    tags: [real-run, tables, engineering]
+  - id: ssl_2020_tigers
+    url: https://ssl.robocup.org/wp-content/uploads/2020/03/2020_ETDP_TIGERS.pdf
+    tags: [real-run, tables, engineering]
+  - id: ssl_2025_delft
+    url: https://ssl.robocup.org/wp-content/uploads/2025/04/2025_TDP_Delft-Mercurians.pdf
+    tags: [real-run, multi-column, engineering]
+  - id: arxiv_attention
+    url: https://arxiv.org/pdf/1706.03762
+    tags: [real-run, math, tables, multi-column]
+  - id: arxiv_ddpm
+    url: https://arxiv.org/pdf/2006.11239
+    tags: [math-heavy]
+  - id: arxiv_bert
+    url: https://arxiv.org/pdf/1810.04805
+    tags: [table-heavy, multi-column]
+  - id: arxiv_resnet
+    url: https://arxiv.org/pdf/1512.03385
+    tags: [figures, tables, math]
+  - id: arxiv_adam
+    url: https://arxiv.org/pdf/1412.6980
+    tags: [algorithm-blocks, math]
+  - id: arxiv_vit
+    url: https://arxiv.org/pdf/2010.11929
+    tags: [math, tables]
+  - id: arxiv_batchnorm
+    url: https://arxiv.org/pdf/1502.03167
+    tags: [dense-math]
+  - id: arxiv_instructgpt
+    url: https://arxiv.org/pdf/2203.02155
+    tags: [tables, multi-column]
+  - id: arxiv_bahdanau
+    url: https://arxiv.org/pdf/1409.0473
+    tags: [older-typesetting, math]
