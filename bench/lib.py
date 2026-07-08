@@ -21,7 +21,7 @@ REPO = BENCH.parent
 PDFS = BENCH / "corpus" / "pdfs"
 OUTPUTS = BENCH / "outputs"
 JUDGE = BENCH / "judge"
-REPORT = BENCH / "report"
+REPORT = BENCH  # the generated report lives at bench/README.md
 
 # Render/judge parameters (recorded in the report — no silent knobs).
 RENDER_DPI = 150

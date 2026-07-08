@@ -21,7 +21,7 @@ The gap is largest on **math** (the current default drops display equations as `
 | 3 | `granite_docling_mlx` | **5.93** | 6.79 | 4.21 | 5.89 | 6.82 | 0.25 | 0.25 | 16.8 |
 | 4 | `docling_standard` | **4.58** | 6.04 | 4.54 | 2.39 | 5.36 | 0.155 | 0.155 | 0.6 |
 | 5 | `chandra` | **—** | — | — | — | — | — | — | — |
-| 6 | `lightonocr_mlx` | **—** | — | — | — | — | — | — | — |
+| 6 | `lightonocr_mlx` | **—** | — | — | — | — | — | — | 15.2 |
 | 7 | `mineru` | **—** | — | — | — | — | — | — | — |
 | 8 | `olmocr2_mlx` | **—** | — | — | — | — | — | — | — |
 | 9 | `paddleocr_vl` | **—** | — | — | — | — | — | — | — |
@@ -50,6 +50,7 @@ The gap is largest on **math** (the current default drops display equations as `
 | `docling_standard` | **0.6** | 0.6 | 11.0 | 154.1 | 14 |
 | `glm_ocr_mlx` | **7.0** | 7.5 | 137.2 | 1509.0 | 11 |
 | `marker` | **12.9** | 20.4 | 344.4 | 4822.1 | 14 |
+| `lightonocr_mlx` | **15.2** | 15.2 | 207.8 | 415.5 | 2 |
 | `granite_docling_mlx` | **16.8** | 16.8 | 304.4 | 4261.0 | 14 |
 
 *Median s/page is the fairer per-page figure; the mean is inflated for backends that reload models per document (e.g. marker cold-starts). Per-page times >60 s were excluded as wall-clock artifacts of the host sleeping during the unattended run (compute pauses, `time.time()` does not) — this is why some backends show fewer than 14 timed docs.*
@@ -64,7 +65,7 @@ The gap is largest on **math** (the current default drops display equations as `
 | `granite_docling_mlx` | 0.88 | 0.0 | 0.005 | 3135.543 |
 | `docling_standard` | 0.843 | 0.0 | 0.047 | 3173.436 |
 | `chandra` | — | — | — | — |
-| `lightonocr_mlx` | — | — | — | — |
+| `lightonocr_mlx` | 0.009 | 0.0 | 0.85 | 4047.4 |
 | `mineru` | — | — | — | — |
 | `olmocr2_mlx` | — | — | — | — |
 | `paddleocr_vl` | — | — | — | — |
@@ -85,7 +86,7 @@ The gap is largest on **math** (the current default drops display equations as `
 
 ## Availability & errors
 
-- `lightonocr_mlx`: 14 failures — e.g. ssl_2025_first_order: not viable via mlx-vlm 0.6.4: 4-bit MLX quant emits degenerate repeated-newline 
+- `lightonocr_mlx`: 12 failures — e.g. ssl_2025_first_order: not viable via mlx-vlm 0.6.4: 4-bit MLX quant emits degenerate repeated-newline 
 - `olmocr2_mlx`: 14 failures — e.g. ssl_2025_first_order: not viable via mlx-vlm 0.6.4 on Apple Silicon: server crashes (Stream(gpu) threa
 - `mineru`: 3 failures — e.g. ssl_2020_tigers: excluded: TimeoutExpired >1800s on 2 pages (model download + CPU inference)
 - `paddleocr_vl`: 3 failures — e.g. ssl_2020_tigers: excluded: >5 min/page (CPU-only wheel on Mac), smoke unfinished after 10 min
