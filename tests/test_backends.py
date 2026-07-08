@@ -10,6 +10,7 @@ import pytest
 from click.testing import CliRunner
 
 from paper_siphon import backends
+from paper_siphon.backends import VlmBackendError
 from paper_siphon.cli import main
 
 
@@ -47,13 +48,13 @@ def test_vlm_convert_dispatches_to_glm_on_apple_silicon():
 
 def test_glm_requires_uv_on_path():
     with patch.object(backends.shutil, "which", return_value=None):
-        with pytest.raises(ImportError, match="uv"):
+        with pytest.raises(VlmBackendError, match="uv"):
             backends.glm_ocr_convert("x.pdf")
 
 
 def test_marker_requires_uv_on_path():
     with patch.object(backends.shutil, "which", return_value=None):
-        with pytest.raises(ImportError, match="uv"):
+        with pytest.raises(VlmBackendError, match="uv"):
             backends.marker_convert("x.pdf")
 
 
@@ -125,12 +126,22 @@ def test_escalation_failure_keeps_standard_output(cli_runner, tmp_path):
     # instead of aborting with no file.
     out = tmp_path / "o.md"
     with patch("paper_siphon.cli.convert_standard", return_value=GARBLED), \
-         patch("paper_siphon.cli.vlm_convert", side_effect=ImportError("uv not found")):
+         patch("paper_siphon.cli.vlm_convert", side_effect=VlmBackendError("uv not found")):
         result = cli_runner.invoke(main, [str(_pdf(tmp_path)), "-o", str(out)])
     assert result.exit_code == 0, result.output
     assert "escalation failed" in result.output.lower()
     assert out.exists()
     assert "❚" in out.read_text()  # the standard (garbled) output was still written
+
+
+def test_escalation_does_not_swallow_programmer_bugs(cli_runner, tmp_path):
+    # A non-VlmBackendError (e.g. a bug in the backend) must NOT be masked as a
+    # successful standard conversion — it should surface as a failure.
+    out = tmp_path / "o.md"
+    with patch("paper_siphon.cli.convert_standard", return_value=GARBLED), \
+         patch("paper_siphon.cli.vlm_convert", side_effect=TypeError("bug")):
+        result = cli_runner.invoke(main, [str(_pdf(tmp_path)), "-o", str(out)])
+    assert result.exit_code == 1
 
 
 def test_marker_command_forces_ocr(tmp_path):
@@ -154,11 +165,12 @@ def test_marker_command_forces_ocr(tmp_path):
         md = backends.marker_convert(Path("paper.pdf"))
     assert md == "# ok"
     assert "--force_ocr" in captured["cmd"]
+    assert "--isolated" in captured["cmd"]
 
 
 def test_missing_backend_dependency_errors_cleanly(cli_runner, tmp_path):
     out = tmp_path / "o.md"
-    with patch("paper_siphon.cli.vlm_convert", side_effect=ImportError("install paper-siphon[marker]")):
+    with patch("paper_siphon.cli.vlm_convert", side_effect=VlmBackendError("install paper-siphon[marker]")):
         result = cli_runner.invoke(
             main, [str(_pdf(tmp_path)), "-o", str(out), "--vlm"]
         )

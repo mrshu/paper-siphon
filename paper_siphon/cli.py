@@ -18,7 +18,7 @@ from docling.datamodel.pipeline_options import (
 )
 from docling.document_converter import DocumentConverter, PdfFormatOption
 
-from paper_siphon.backends import vlm_backend_name, vlm_convert
+from paper_siphon.backends import VlmBackendError, vlm_backend_name, vlm_convert
 from paper_siphon.cleaning import clean_markdown
 from paper_siphon.quality import needs_escalation
 
@@ -197,13 +197,16 @@ def main(
                         # discarding a conversion Docling already produced.
                         try:
                             markdown = vlm_convert(file_path, use_mlx=mlx)
-                        except Exception as e:
+                        except VlmBackendError as e:
+                            # Operational backend failure only — keep the usable
+                            # standard output. Programmer bugs are not caught
+                            # here and surface via the outer handler.
                             click.echo(
                                 f"VLM escalation failed ({e}); keeping the "
                                 "standard-pipeline output",
                                 err=True,
                             )
-        except ImportError as e:
+        except VlmBackendError as e:
             click.echo(f"Error: {e}", err=True)
             sys.exit(1)
         except Exception as e:

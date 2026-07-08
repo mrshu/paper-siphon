@@ -4,14 +4,18 @@
   benchmark winner.
 - marker (``marker-pdf``) on other platforms.
 
-Both run in an **isolated** ``uv run --with`` environment rather than the main
-process. This is deliberate: mlx-vlm and marker pull a newer ``transformers``
-that breaks Docling's default-pipeline layout model on MPS, so they must not
-share paper-siphon's environment. Isolation keeps the fast default pipeline
-working while still offering a high-quality VLM path. The ``--vlm`` path
-therefore requires ``uv`` on PATH (every ``uvx paper-siphon`` user has it).
+Both run in an **isolated** ``uv run --isolated --no-project --with`` environment
+rather than the main process. This is deliberate: mlx-vlm and marker pull a
+newer ``transformers`` that breaks Docling's default-pipeline layout model on
+MPS, so they must not share paper-siphon's environment. ``--isolated`` forces a
+fresh venv (``--no-project`` alone would still reuse a discovered ``.venv``), so
+the isolation holds even when paper-siphon is run from inside a project.
+The ``--vlm`` path requires ``uv`` on PATH (every ``uvx paper-siphon`` user has it).
 
 Backends return *raw* Markdown; the CLI applies ``clean_markdown`` uniformly.
+Operational failures raise ``VlmBackendError`` so callers can distinguish an
+expected backend problem (missing uv, download/timeout, subprocess failure)
+from a programmer bug, which must surface rather than be swallowed.
 """
 
 from __future__ import annotations
@@ -19,7 +23,6 @@ from __future__ import annotations
 import platform
 import shutil
 import subprocess
-import tempfile
 from pathlib import Path
 
 # generous ceiling — a long PDF through a per-page VLM can take a while
@@ -27,17 +30,47 @@ _VLM_TIMEOUT = 7200
 _RUNNER = Path(__file__).resolve().parent / "_glm_runner.py"
 
 
+class VlmBackendError(RuntimeError):
+    """An expected, operational failure of a VLM backend (missing uv, model
+    download/network failure, timeout, subprocess crash, empty output)."""
+
+
 def is_apple_silicon() -> bool:
     return platform.system() == "Darwin" and platform.machine() == "arm64"
 
 
+def _select_backend(use_mlx: bool) -> str:
+    """Single source of truth for which backend the VLM path uses, so dispatch
+    and the displayed name can never diverge."""
+    return "glm-ocr" if (use_mlx and is_apple_silicon()) else "marker"
+
+
 def _require_uv() -> None:
     if shutil.which("uv") is None:
-        raise ImportError(
+        raise VlmBackendError(
             "The --vlm backend runs in an isolated environment and requires "
             "'uv' on PATH. Install uv (https://docs.astral.sh/uv/) or run "
             "paper-siphon via 'uvx paper-siphon'."
         )
+
+
+def _run_isolated(cmd: list[str], backend: str) -> subprocess.CompletedProcess:
+    """Run an isolated `uv run` backend command, normalizing failures/timeouts
+    to VlmBackendError with a useful stderr tail."""
+    try:
+        proc = subprocess.run(
+            cmd, capture_output=True, text=True, encoding="utf-8",
+            timeout=_VLM_TIMEOUT,
+        )
+    except subprocess.TimeoutExpired as e:
+        tail = (e.stderr or "")[-1200:] if isinstance(e.stderr, str) else ""
+        raise VlmBackendError(
+            f"{backend} backend timed out after {_VLM_TIMEOUT}s"
+            + (f":\n{tail}" if tail else "")
+        ) from e
+    if proc.returncode != 0:
+        raise VlmBackendError(f"{backend} backend failed:\n{proc.stderr[-1200:]}")
+    return proc
 
 
 def glm_ocr_convert(pdf_path: Path) -> str:
@@ -47,28 +80,28 @@ def glm_ocr_convert(pdf_path: Path) -> str:
     both are cached for subsequent runs.
     """
     _require_uv()
-    proc = subprocess.run(
+    proc = _run_isolated(
         [
-            "uv", "run", "--no-project", "--python", "3.12",
+            "uv", "run", "--isolated", "--no-project", "--python", "3.12",
             "--with", "mlx-vlm>=0.3.11,<0.7", "--with", "pymupdf",
             "python", str(_RUNNER), str(pdf_path),
         ],
-        capture_output=True, text=True, timeout=_VLM_TIMEOUT,
+        backend="GLM-OCR",
     )
-    if proc.returncode != 0:
-        raise RuntimeError(f"GLM-OCR backend failed:\n{proc.stderr[-1200:]}")
     if not proc.stdout.strip():
-        raise RuntimeError("GLM-OCR backend produced no output")
+        raise VlmBackendError("GLM-OCR backend produced no output")
     return proc.stdout
 
 
 def marker_convert(pdf_path: Path) -> str:
     """marker via an isolated uv env. Returns raw Markdown."""
+    import tempfile
+
     _require_uv()
     with tempfile.TemporaryDirectory() as td:
-        proc = subprocess.run(
+        _run_isolated(
             [
-                "uv", "run", "--no-project",
+                "uv", "run", "--isolated", "--no-project",
                 "--with", "marker-pdf>=1.0,<2",
                 "marker_single", str(pdf_path),
                 "--output_dir", td,
@@ -80,27 +113,25 @@ def marker_convert(pdf_path: Path) -> str:
                 # same corrupted embedded text. (marker's own guidance.)
                 "--force_ocr",
             ],
-            capture_output=True, text=True, timeout=_VLM_TIMEOUT,
+            backend="marker",
         )
-        if proc.returncode != 0:
-            raise RuntimeError(f"marker backend failed:\n{proc.stderr[-1200:]}")
         stem = Path(pdf_path).stem
         out = Path(td) / stem / f"{stem}.md"
         if out.exists():
-            return out.read_text()
+            return out.read_text(encoding="utf-8")
         mds = sorted(Path(td).rglob("*.md"), key=lambda p: -p.stat().st_size)
         if not mds:
-            raise RuntimeError("marker backend produced no Markdown output")
-        return mds[0].read_text()
+            raise VlmBackendError("marker backend produced no Markdown output")
+        return mds[0].read_text(encoding="utf-8")
 
 
 def vlm_convert(pdf_path: Path, use_mlx: bool = True) -> str:
     """Dispatch the VLM path: GLM-OCR on Apple Silicon (unless disabled),
     marker otherwise. Returns raw Markdown."""
-    if use_mlx and is_apple_silicon():
+    if _select_backend(use_mlx) == "glm-ocr":
         return glm_ocr_convert(pdf_path)
     return marker_convert(pdf_path)
 
 
 def vlm_backend_name(use_mlx: bool = True) -> str:
-    return "GLM-OCR (MLX)" if (use_mlx and is_apple_silicon()) else "marker"
+    return "GLM-OCR (MLX)" if _select_backend(use_mlx) == "glm-ocr" else "marker"
