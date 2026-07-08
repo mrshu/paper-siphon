@@ -5,6 +5,22 @@
 marker elsewhere, and auto-escalate the fast default pipeline to the VLM path
 when its output looks garbled or drops math.
 
+## As-built deltas (differs from the original design below)
+
+Implementation review surfaced a dependency conflict that changed the approach:
+
+- **Isolation, not in-process.** mlx-vlm/marker pull a newer `transformers` that
+  breaks Docling's default pipeline on MPS, so the VLM backends run in an
+  isolated `uv run --isolated --no-project --with …` subprocess — there is **no
+  in-process path and no mlx-vlm server fallback**. `--vlm` requires `uv` on PATH.
+- **No optional-dependency extras.** The `mlx`/`marker` extras were dropped;
+  backends self-provision via `uv`, so installing them into the main env (the
+  conflict) is impossible.
+- **No page cap** on the VLM pass (full-document fidelity); auto-escalation is
+  best-effort and falls back to the standard output on `VlmBackendError`.
+
+The rest of this document is the original pre-implementation design.
+
 ## Motivation
 
 The backend benchmark (`bench/`, 2026-07-08) showed GLM-OCR beats paper-siphon's
