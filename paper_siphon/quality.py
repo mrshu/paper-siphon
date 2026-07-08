@@ -35,6 +35,11 @@ _MIN_LEN = 500
 
 _FORMULA_MARKER = "formula-not-decoded"
 _GLYPH_LEAK = "glyph["
+# The default pipeline leaves a formula-not-decoded marker for every equation it
+# does not decode (expected when --enrich-formula is off). A stray undecoded
+# formula is not worth a full VLM re-run; only escalate when math is pervasively
+# dropped, i.e. the paper is genuinely math-heavy and the default is failing it.
+_MIN_DROPPED_FORMULAS = 3
 
 
 def _garble_ratio(markdown: str) -> float:
@@ -62,8 +67,10 @@ def looks_garbled(markdown: str) -> bool:
 
 
 def dropped_math(markdown: str) -> bool:
-    """True when Docling left undecoded formula markers."""
-    return _FORMULA_MARKER in markdown
+    """True when Docling left undecoded formula markers pervasively (>= the
+    threshold), i.e. the document has substantial math the fast pipeline could
+    not decode. A stray marker or two does not escalate."""
+    return markdown.count(_FORMULA_MARKER) >= _MIN_DROPPED_FORMULAS
 
 
 def needs_escalation(markdown: str) -> tuple[bool, str]:

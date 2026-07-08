@@ -36,12 +36,19 @@ def test_garbled_output_escalates():
     assert "garbled" in reason
 
 
-def test_dropped_math_escalates():
-    md = CLEAN + "\n\nThe loss is <!-- formula-not-decoded -->\n"
+def test_pervasive_dropped_math_escalates():
+    md = CLEAN + "\n\n" + "The loss is <!-- formula-not-decoded -->\n" * 3
     assert dropped_math(md) is True
     should, reason = needs_escalation(md)
     assert should is True
     assert "equation" in reason
+
+
+def test_stray_dropped_math_does_not_escalate():
+    # a couple of incidental undecoded formulas must not trigger a full VLM run
+    md = CLEAN + "\n\n" + "inline <!-- formula-not-decoded -->\n" * 2
+    assert dropped_math(md) is False
+    assert needs_escalation(md)[0] is False
 
 
 def test_leaked_glyph_names_escalate():
