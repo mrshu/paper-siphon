@@ -1,0 +1,39 @@
+{
+  "scores": {
+    "A": {
+      "text": 8,
+      "tables": 5,
+      "math": 8,
+      "structure": 7,
+      "evidence": "Good prose coverage through shown pages, but Table 1 and Table 2 first rows merge label/value, Table 3 has extra empty columns, and page header '6 M. Liang et al.' is inserted as a heading."
+    },
+    "B": {
+      "text": 7,
+      "tables": 7,
+      "math": 5,
+      "structure": 7,
+      "evidence": "Most prose is present, but image OCR noise like 'Other' appears around Fig. 4, bullets are malformed, Table 2 first row is split incorrectly, and the solenoid equation has wrong denominator/exponent terms."
+    },
+    "C": {
+      "text": 7,
+      "tables": 8,
+      "math": 2,
+      "structure": 6,
+      "evidence": "Tables 1-3 are mostly structurally correct and Table 2 is fixed, but the main equation is replaced by '<!-- formula-not-decoded -->' and figure-label OCR is interleaved into the text/order."
+    },
+    "D": {
+      "text": 9,
+      "tables": 7,
+      "math": 7,
+      "structure": 8,
+      "evidence": "Clean prose and good Table 1/Table 3 extraction, but Table 2 is omitted entirely and the solenoid equation loses the l term in the denominator; figure captions around Fig. 3/6 are also missing."
+    }
+  },
+  "ranking": [
+    "D",
+    "B",
+    "A",
+    "C"
+  ],
+  "judge": "codex"
+}

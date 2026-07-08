@@ -1,0 +1,39 @@
+{
+  "scores": {
+    "A": {
+      "text": 8,
+      "tables": 3,
+      "math": 9,
+      "structure": 8,
+      "evidence": "Prose and equation are mostly faithful, but visible references/conclusion tail are missing and Tables 1-3 have merged headers/cells such as 'Mean Median' and angular velocity values in the label cell."
+    },
+    "B": {
+      "text": 9,
+      "tables": 7,
+      "math": 10,
+      "structure": 9,
+      "evidence": "Prose, references, conclusion, and cost equation are faithful; Tables 2-3 are correct, but visible Table 1 is missing entirely."
+    },
+    "C": {
+      "text": 7,
+      "tables": 9,
+      "math": 1,
+      "structure": 7,
+      "evidence": "Tables 1-3 are structurally good, but plot OCR noise is inserted into text, the cost equation is replaced by '<!-- formula-not-decoded -->', and references are truncated."
+    },
+    "D": {
+      "text": 7,
+      "tables": 7,
+      "math": 4,
+      "structure": 7,
+      "evidence": "Mostly preserves prose but has OCR errors like 'roboup', altered wording, Table 1 angular velocity row shifted/mangled, and the cost equation has garbled subscript text."
+    }
+  },
+  "ranking": [
+    "B",
+    "C",
+    "A",
+    "D"
+  ],
+  "judge": "codex"
+}

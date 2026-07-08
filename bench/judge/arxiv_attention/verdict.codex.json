@@ -1,0 +1,39 @@
+{
+  "scores": {
+    "A": {
+      "text": 8,
+      "tables": 8,
+      "math": 3,
+      "structure": 7,
+      "evidence": "Good prose coverage through section 4 and Table 1, but all displayed equations are replaced by formula-not-decoded and Figure 1/2 diagram text is jumbled into the reading flow."
+    },
+    "B": {
+      "text": 8,
+      "tables": 9,
+      "math": 8,
+      "structure": 8,
+      "evidence": "Strong prose, equations, and Table 1; minor damage includes noisy citation links, malformed footnote HTML, and garbled parameter-matrix superscripts after MultiHead."
+    },
+    "C": {
+      "text": 9,
+      "tables": 9,
+      "math": 9,
+      "structure": 8,
+      "evidence": "Very faithful prose, equations, and Table 1; misses the visible Google permission notice and mostly omits figure/diagram content, with plain rather than consistent heading markup."
+    },
+    "D": {
+      "text": 7,
+      "tables": 8,
+      "math": 6,
+      "structure": 7,
+      "evidence": "Captures most prose and Table 1, but has OCR/math damage such as h_t_-_1 and spaced-out LaTeX, a typo in sequence-aligned, and hallucinated Flow chart text near Figure 2."
+    }
+  },
+  "ranking": [
+    "C",
+    "B",
+    "D",
+    "A"
+  ],
+  "judge": "codex"
+}

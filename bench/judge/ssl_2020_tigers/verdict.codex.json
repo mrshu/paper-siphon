@@ -1,0 +1,39 @@
+{
+  "scores": {
+    "A": {
+      "text": 1,
+      "tables": 2,
+      "math": 1,
+      "structure": 4,
+      "evidence": "Most prose is unreadable dingbat/a-code glyph garbage; Table 1 row/column shape is present but cell text is also garbled; captions/headings roughly ordered."
+    },
+    "B": {
+      "text": 6,
+      "tables": 0,
+      "math": 7,
+      "structure": 5,
+      "evidence": "Readable prose but drops the page-2 introduction paragraphs and Table 1 entirely, jumps from Fig. 1 to Fig. 2/section 2, and has OCR artifacts like GLYPH/turing."
+    },
+    "C": {
+      "text": 9,
+      "tables": 9,
+      "math": 9,
+      "structure": 9,
+      "evidence": "Faithfully captures visible prose, headings, captions, footnotes, symbols, and Table 1 with only minor OCR/spelling issues and truncation at the start of Fig. 7."
+    },
+    "D": {
+      "text": 8,
+      "tables": 8,
+      "math": 9,
+      "structure": 8,
+      "evidence": "Good reading order and table, but ligatures are lost in many words such as fth/gure/xes/specications/dierent and the shown output truncates during the page-9 dribbler text."
+    }
+  },
+  "ranking": [
+    "C",
+    "D",
+    "B",
+    "A"
+  ],
+  "judge": "codex"
+}

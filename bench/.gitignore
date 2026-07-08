@@ -1,0 +1,7 @@
+# Large / regenerable artifacts — not committed.
+corpus/pdfs/
+outputs/
+judge/*/pages/
+.venvs/
+__pycache__/
+*.pyc

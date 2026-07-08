@@ -94,6 +94,22 @@ post-processing to clean up common academic paper artifacts:
 | `--enrich-formula` | Enable formula enrichment (slow, CPU-bound) |
 | `-v, --verbose` | Enable debug logging |
 
+## Backend benchmark
+
+Which PDF→Markdown backend should Paper Siphon use? [`bench/`](bench/README.md)
+holds a reproducible benchmark that compares candidate backends on 14 public
+academic PDFs using a blinded dual-LLM-judge evaluation (plus reference-free
+metrics and Apple-Silicon speed).
+
+Headline result (overall /10, mean of two blinded judges): **GLM-OCR 7.62** >
+Marker 7.32 > GraniteDocling MLX 5.93 (current `--vlm`) > Docling standard 4.58
+(current default). GLM-OCR wins ~83% of blind head-to-heads and is *faster* than
+the current VLM (~7 vs ~17 s/page on an M4 Max), with the largest gains on math
+and pathological font-encoding. Leaderboard-topping candidates (MinerU,
+PaddleOCR-VL, Chandra, olmOCR-2, LightOnOCR) proved impractical or non-viable on
+Apple Silicon via their MLX paths. See [`bench/README.md`](bench/README.md) for
+the full tables, methodology, and caveats.
+
 ## Development
 
 ```bash

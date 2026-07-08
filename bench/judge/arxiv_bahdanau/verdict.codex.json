@@ -1,0 +1,39 @@
+{
+  "scores": {
+    "A": {
+      "text": 8,
+      "tables": 0,
+      "math": 8,
+      "structure": 8,
+      "evidence": "Good prose coverage through section 4.2, but author affiliation accents and some words are garbled; Table 1 is missing; equations mostly usable with some subscript/superscript errors."
+    },
+    "B": {
+      "text": 9,
+      "tables": 0,
+      "math": 8,
+      "structure": 9,
+      "evidence": "Clean prose and reading order through results; Table 1 is missing; equations are usable, though BiRNN arrows/backward notation are wrong and equation numbers are detached."
+    },
+    "C": {
+      "text": 7,
+      "tables": 0,
+      "math": 6,
+      "structure": 7,
+      "evidence": "Mostly complete prose but with OCR errors like Kalchbrneren and Universit'e; Table 1 is missing; math is readable but cluttered with escaped underscores and lost equation numbers."
+    },
+    "D": {
+      "text": 5,
+      "tables": 0,
+      "math": 1,
+      "structure": 5,
+      "evidence": "Prose is partly intact but author lines and symbols are mangled, formulas are replaced by formula-not-decoded, and Figure 3 alignment image becomes OCR junk; Table 1 is missing."
+    }
+  },
+  "ranking": [
+    "B",
+    "A",
+    "C",
+    "D"
+  ],
+  "judge": "codex"
+}
