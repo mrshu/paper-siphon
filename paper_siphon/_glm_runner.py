@@ -55,11 +55,22 @@ def main() -> None:
                     model, processor, formatted, image=[str(img)],
                     max_tokens=MAX_TOKENS, verbose=False,
                 )
-            text = result if isinstance(result, str) else getattr(result, "text", str(result))
+            if isinstance(result, str):
+                text = result
+            elif isinstance(getattr(result, "text", None), str):
+                text = result.text
+            else:
+                # Fail loudly on an unexpected mlx-vlm return shape rather than
+                # writing a Python repr as if it were page Markdown.
+                raise RuntimeError(
+                    f"unexpected mlx_vlm.generate result type: {type(result).__name__}"
+                )
             parts.append(text.strip())
     doc.close()
 
-    sys.stdout.write("\n\n".join(parts))
+    # Write UTF-8 explicitly so the parent's utf-8 capture round-trips
+    # regardless of the child's locale encoding.
+    sys.stdout.buffer.write("\n\n".join(parts).encode("utf-8"))
 
 
 if __name__ == "__main__":
