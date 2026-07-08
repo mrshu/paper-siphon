@@ -50,7 +50,7 @@ def glm_ocr_convert(pdf_path: Path) -> str:
     proc = subprocess.run(
         [
             "uv", "run", "--no-project", "--python", "3.12",
-            "--with", "mlx-vlm>=0.3.11", "--with", "pymupdf",
+            "--with", "mlx-vlm>=0.3.11,<0.7", "--with", "pymupdf",
             "python", str(_RUNNER), str(pdf_path),
         ],
         capture_output=True, text=True, timeout=_VLM_TIMEOUT,
@@ -69,11 +69,16 @@ def marker_convert(pdf_path: Path) -> str:
         proc = subprocess.run(
             [
                 "uv", "run", "--no-project",
-                "--with", "marker-pdf",
+                "--with", "marker-pdf>=1.0,<2",
                 "marker_single", str(pdf_path),
                 "--output_dir", td,
                 "--output_format", "markdown",
                 "--disable_image_extraction",
+                # The VLM path is invoked precisely when the fast pipeline
+                # produced bad text (garbled encoding) or the user forced it;
+                # force OCR so marker re-reads the page instead of reusing the
+                # same corrupted embedded text. (marker's own guidance.)
+                "--force_ocr",
             ],
             capture_output=True, text=True, timeout=_VLM_TIMEOUT,
         )
