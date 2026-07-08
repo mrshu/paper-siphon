@@ -9,12 +9,17 @@ transformers pin it would conflict with).
 Usage: python _glm_runner.py <pdf_path>
 """
 
+import contextlib
+import io
 import sys
 import tempfile
 from pathlib import Path
 
 MODEL = "mlx-community/GLM-OCR-bf16"
 DPI = 150
+# Per-page generation cap. Dense two-column pages with tables + LaTeX can exceed
+# a few thousand tokens; keep this generous so a page is not silently truncated.
+MAX_TOKENS = 8192
 PROMPT = (
     "Convert this document page image to clean GitHub-flavored Markdown. "
     "Preserve headings, paragraphs, lists, tables (as Markdown or HTML), and "
@@ -42,10 +47,14 @@ def main() -> None:
             img = Path(td) / f"p{i + 1:04d}.png"
             doc.load_page(i).get_pixmap(matrix=fitz.Matrix(zoom, zoom)).save(str(img))
             formatted = apply_chat_template(processor, config, PROMPT, num_images=1)
-            result = generate(
-                model, processor, formatted, image=[str(img)],
-                max_tokens=4096, verbose=False,
-            )
+            # Isolate generate()'s own stdout: stdout carries the Markdown result
+            # back to the parent, so any stray prints from the library must not
+            # leak into it. (verbose=False already suppresses stats; belt-and-braces.)
+            with contextlib.redirect_stdout(io.StringIO()):
+                result = generate(
+                    model, processor, formatted, image=[str(img)],
+                    max_tokens=MAX_TOKENS, verbose=False,
+                )
             text = result if isinstance(result, str) else getattr(result, "text", str(result))
             parts.append(text.strip())
     doc.close()
