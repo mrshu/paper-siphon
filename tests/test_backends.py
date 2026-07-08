@@ -3,6 +3,7 @@
 Heavy backends (GLM-OCR / marker) are mocked so these stay fast and dep-free.
 """
 
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -117,6 +118,42 @@ def test_no_escalate_keeps_garbled_output(cli_runner, tmp_path):
         )
     assert result.exit_code == 0, result.output
     vc.assert_not_called()
+
+
+def test_escalation_failure_keeps_standard_output(cli_runner, tmp_path):
+    # RAVF001: if auto-escalation's VLM retry fails, keep the standard output
+    # instead of aborting with no file.
+    out = tmp_path / "o.md"
+    with patch("paper_siphon.cli.convert_standard", return_value=GARBLED), \
+         patch("paper_siphon.cli.vlm_convert", side_effect=ImportError("uv not found")):
+        result = cli_runner.invoke(main, [str(_pdf(tmp_path)), "-o", str(out)])
+    assert result.exit_code == 0, result.output
+    assert "escalation failed" in result.output.lower()
+    assert out.exists()
+    assert "❚" in out.read_text()  # the standard (garbled) output was still written
+
+
+def test_marker_command_forces_ocr(tmp_path):
+    captured = {}
+
+    def fake_run(cmd, **kwargs):
+        captured["cmd"] = cmd
+        td = cmd[cmd.index("--output_dir") + 1]
+        stem = Path(cmd[cmd.index("marker_single") + 1]).stem
+        d = Path(td) / stem
+        d.mkdir(parents=True, exist_ok=True)
+        (d / f"{stem}.md").write_text("# ok")
+        class R:
+            returncode = 0
+            stderr = ""
+        return R()
+
+    with patch.object(backends, "is_apple_silicon", return_value=False), \
+         patch.object(backends.shutil, "which", return_value="/usr/bin/uv"), \
+         patch.object(backends.subprocess, "run", fake_run):
+        md = backends.marker_convert(Path("paper.pdf"))
+    assert md == "# ok"
+    assert "--force_ocr" in captured["cmd"]
 
 
 def test_missing_backend_dependency_errors_cleanly(cli_runner, tmp_path):

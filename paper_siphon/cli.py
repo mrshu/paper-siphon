@@ -191,7 +191,18 @@ def main(
                             f"Default {reason}; re-running with "
                             f"{vlm_backend_name(mlx)}"
                         )
-                        markdown = vlm_convert(file_path, use_mlx=mlx)
+                        # Auto-escalation is best-effort: if the VLM backend
+                        # can't run (no uv, download/network failure, timeout,
+                        # crash), keep the usable standard output rather than
+                        # discarding a conversion Docling already produced.
+                        try:
+                            markdown = vlm_convert(file_path, use_mlx=mlx)
+                        except Exception as e:
+                            click.echo(
+                                f"VLM escalation failed ({e}); keeping the "
+                                "standard-pipeline output",
+                                err=True,
+                            )
         except ImportError as e:
             click.echo(f"Error: {e}", err=True)
             sys.exit(1)
