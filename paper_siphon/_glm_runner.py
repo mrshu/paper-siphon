@@ -28,49 +28,56 @@ PROMPT = (
 )
 
 
+def _extract_text(result) -> str:
+    """Normalize mlx_vlm.generate's return across the supported version range.
+
+    Accept a plain string or an object with a str ``.text``; anything else is an
+    unexpected contract change and must fail loudly rather than be written to
+    the output as a Python repr. Kept import-free so it is unit-testable without
+    mlx-vlm installed.
+    """
+    if isinstance(result, str):
+        return result
+    if isinstance(getattr(result, "text", None), str):
+        return result.text
+    raise RuntimeError(
+        f"unexpected mlx_vlm.generate result type: {type(result).__name__}"
+    )
+
+
 def main() -> None:
     pdf_path = sys.argv[1]
+    real_stdout = sys.stdout
 
-    import fitz  # PyMuPDF
-    from mlx_vlm import generate, load
-    from mlx_vlm.prompt_utils import apply_chat_template
-    from mlx_vlm.utils import load_config
-
-    model, processor = load(MODEL)
-    config = load_config(MODEL)
-
-    doc = fitz.open(pdf_path)
-    zoom = DPI / 72.0
+    # Everything the VLM stack does (model load, config, generation) runs with
+    # stdout redirected to a sink, so no library banner or stray print can
+    # contaminate the Markdown — which we emit to the *saved* real stdout at the
+    # end as UTF-8 bytes (round-trips regardless of the child's locale encoding).
     parts: list[str] = []
-    with tempfile.TemporaryDirectory() as td:
-        for i in range(doc.page_count):
-            img = Path(td) / f"p{i + 1:04d}.png"
-            doc.load_page(i).get_pixmap(matrix=fitz.Matrix(zoom, zoom)).save(str(img))
-            formatted = apply_chat_template(processor, config, PROMPT, num_images=1)
-            # Isolate generate()'s own stdout: stdout carries the Markdown result
-            # back to the parent, so any stray prints from the library must not
-            # leak into it. (verbose=False already suppresses stats; belt-and-braces.)
-            with contextlib.redirect_stdout(io.StringIO()):
+    with contextlib.redirect_stdout(io.StringIO()):
+        import fitz  # PyMuPDF
+        from mlx_vlm import generate, load
+        from mlx_vlm.prompt_utils import apply_chat_template
+        from mlx_vlm.utils import load_config
+
+        model, processor = load(MODEL)
+        config = load_config(MODEL)
+
+        doc = fitz.open(pdf_path)
+        zoom = DPI / 72.0
+        with tempfile.TemporaryDirectory() as td:
+            for i in range(doc.page_count):
+                img = Path(td) / f"p{i + 1:04d}.png"
+                doc.load_page(i).get_pixmap(matrix=fitz.Matrix(zoom, zoom)).save(str(img))
+                formatted = apply_chat_template(processor, config, PROMPT, num_images=1)
                 result = generate(
                     model, processor, formatted, image=[str(img)],
                     max_tokens=MAX_TOKENS, verbose=False,
                 )
-            if isinstance(result, str):
-                text = result
-            elif isinstance(getattr(result, "text", None), str):
-                text = result.text
-            else:
-                # Fail loudly on an unexpected mlx-vlm return shape rather than
-                # writing a Python repr as if it were page Markdown.
-                raise RuntimeError(
-                    f"unexpected mlx_vlm.generate result type: {type(result).__name__}"
-                )
-            parts.append(text.strip())
-    doc.close()
+                parts.append(_extract_text(result).strip())
+        doc.close()
 
-    # Write UTF-8 explicitly so the parent's utf-8 capture round-trips
-    # regardless of the child's locale encoding.
-    sys.stdout.buffer.write("\n\n".join(parts).encode("utf-8"))
+    real_stdout.buffer.write("\n\n".join(parts).encode("utf-8"))
 
 
 if __name__ == "__main__":
