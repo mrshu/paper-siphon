@@ -74,6 +74,14 @@ def main() -> None:
                     model, processor, formatted, image=[str(img)],
                     max_tokens=MAX_TOKENS, verbose=False,
                 )
+                # Fail loudly if a page was truncated at the token cap rather
+                # than saving a silently-incomplete page as if it were whole;
+                # the parent turns the nonzero exit into a VlmBackendError so
+                # auto-escalation keeps the standard output.
+                if getattr(result, "finish_reason", None) == "length":
+                    raise RuntimeError(
+                        f"page {i + 1} hit the {MAX_TOKENS}-token cap (truncated)"
+                    )
                 parts.append(_extract_text(result).strip())
         doc.close()
 
