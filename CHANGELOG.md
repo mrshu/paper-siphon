@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `--vlm` now uses GLM-OCR on Apple Silicon (marker on other platforms),
+  replacing the GraniteDocling MLX pipeline. The VLM backends run in an
+  isolated `uv`-managed environment, so `--vlm` requires `uv` on PATH and the
+  model downloads (~2 GB) on first use.
+
+### Added
+
+- Auto-escalation: the fast default pipeline now re-runs with the VLM backend
+  when its output looks garbled (font-decoding failure) or drops equations.
+  Disable with `--no-escalate`; escalation failures fall back to the standard
+  output rather than aborting.
+
+### Removed
+
+- The `mlx` optional-dependency extra (VLM backends self-provision via `uv`).
+
 ## [0.3.0] - 2025-01-25
 
 ### Added
