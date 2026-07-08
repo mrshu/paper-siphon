@@ -68,6 +68,14 @@ def test_short_fully_garbled_output_escalates():
     assert needs_escalation(md)[0] is True
 
 
+def test_symbol_heavy_math_prose_not_garbled():
+    # legitimate notation (arrows, proof boxes, stars) above the 5% symbol ratio
+    # must not escalate — real prose keeps high ASCII-letter density
+    md = ("In this section, A → B and C ← D. We prove □ and use ★ for ratings. " * 20)
+    assert looks_garbled(md) is False
+    assert needs_escalation(md)[0] is False
+
+
 def test_math_alphanumeric_symbols_not_garbled():
     # U+1D400-1D7FF (𝔼 𝒩 𝓛) are legitimate math notation, not garble
     md = ("We estimate 𝔼[x] under 𝒩(0, I) and minimize the loss 𝓛(θ). " * 20)

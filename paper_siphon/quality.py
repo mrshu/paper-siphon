@@ -47,6 +47,13 @@ _GLYPH_LEAK = "glyph["
 _MIN_DROPPED_FORMULAS = 3
 
 
+# Below this ASCII-letter density (letters / non-space chars) a document is not
+# normal prose — a font-decode failure replaces words with glyphs and collapses
+# letter density, whereas legitimate symbol-heavy notation still sits in mostly
+# ASCII-letter text.
+_MIN_LETTER_RATIO = 0.5
+
+
 def _garble_ratio(markdown: str) -> float:
     chars = [c for c in markdown if not c.isspace()]
     if not chars:
@@ -55,6 +62,13 @@ def _garble_ratio(markdown: str) -> float:
         any(lo <= ord(c) <= hi for lo, hi in _GARBLE_RANGES) for c in chars
     )
     return hits / len(chars)
+
+
+def _ascii_letter_ratio(markdown: str) -> float:
+    chars = [c for c in markdown if not c.isspace()]
+    if not chars:
+        return 0.0
+    return sum(c.isascii() and c.isalpha() for c in chars) / len(chars)
 
 
 def looks_garbled(markdown: str) -> bool:
@@ -72,13 +86,24 @@ def looks_garbled(markdown: str) -> bool:
     # positives on short snippets that legitimately contain a few symbols.
     if len(markdown) < _MIN_LEN:
         return False
-    return ratio > _GARBLE_THRESHOLD
+    # Require BOTH a high garble ratio and collapsed letter density, so
+    # legitimate symbol-heavy notation (arrows, proof boxes, stars in math
+    # prose) that clears the ratio does not trigger escalation on its own.
+    return ratio > _GARBLE_THRESHOLD and _ascii_letter_ratio(markdown) < _MIN_LETTER_RATIO
 
 
 def dropped_math(markdown: str) -> bool:
     """True when Docling left undecoded formula markers pervasively (>= the
     threshold), i.e. the document has substantial math the fast pipeline could
-    not decode. A stray marker or two does not escalate."""
+    not decode. A stray marker or two does not escalate.
+
+    Note: the default pipeline emits these markers for every formula whenever
+    --enrich-formula is off, so a genuinely math-heavy paper will escalate to
+    the VLM backend by default. That is intentional — the benchmark showed the
+    fast pipeline is poor at math and the VLM recovers it — and is disclosed via
+    the escalation notice and README. Use --no-escalate or --enrich-formula to
+    opt out of the VLM re-run for math papers.
+    """
     return markdown.count(_FORMULA_MARKER) >= _MIN_DROPPED_FORMULAS
 
 
