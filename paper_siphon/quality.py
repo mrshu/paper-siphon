@@ -25,13 +25,18 @@ _GARBLE_RANGES = (
     (0x2600, 0x26FF),   # miscellaneous symbols
     (0x2700, 0x27BF),   # dingbats
     (0x2B00, 0x2BFF),   # miscellaneous symbols and arrows
-    (0x1D400, 0x1D7FF),  # mathematical alphanumeric symbols
 )
+# NB: Mathematical Alphanumeric Symbols (U+1D400-1D7FF: 𝔼, 𝒩, 𝓛, …) are
+# deliberately NOT counted as garble — they are legitimate notation in the
+# math-heavy papers this tool targets.
 
 # Above this fraction of non-space characters being "garble glyphs" on a
 # document with real content, the output is a font-decode failure.
 _GARBLE_THRESHOLD = 0.05
 _MIN_LEN = 500
+# A short output that is overwhelmingly garble is still a decode failure, even
+# below _MIN_LEN — a high ratio can't be incidental symbols in real prose.
+_SHORT_GARBLE_RATIO = 0.5
 
 _FORMULA_MARKER = "formula-not-decoded"
 _GLYPH_LEAK = "glyph["
@@ -59,11 +64,15 @@ def looks_garbled(markdown: str) -> bool:
     # — real Markdown does not repeat "glyph[" — so this is not length-gated.
     if markdown.count(_GLYPH_LEAK) >= 5:
         return True
-    # The symbol-ratio signal needs a length gate to avoid false positives on
-    # short snippets that legitimately contain a few symbols.
+    ratio = _garble_ratio(markdown)
+    # A short output that is overwhelmingly garble is still a decode failure.
+    if markdown.strip() and ratio >= _SHORT_GARBLE_RATIO:
+        return True
+    # Otherwise the symbol-ratio signal needs a length gate to avoid false
+    # positives on short snippets that legitimately contain a few symbols.
     if len(markdown) < _MIN_LEN:
         return False
-    return _garble_ratio(markdown) > _GARBLE_THRESHOLD
+    return ratio > _GARBLE_THRESHOLD
 
 
 def dropped_math(markdown: str) -> bool:

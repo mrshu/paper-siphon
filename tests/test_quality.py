@@ -56,9 +56,23 @@ def test_leaked_glyph_names_escalate():
     assert looks_garbled(md) is True
 
 
-def test_short_output_never_garbled():
+def test_short_mixed_output_not_garbled():
     # a couple of stray symbols in a tiny string must not false-positive
     assert looks_garbled("Fig. 3 ▼ shows the result") is False
+
+
+def test_short_fully_garbled_output_escalates():
+    # a short but overwhelmingly-garble extraction is still a decode failure
+    md = "❚■●❊❘ ▼❛♥♥❤❡✐♠ " * 10  # ~150 chars, dominated by symbol glyphs
+    assert looks_garbled(md) is True
+    assert needs_escalation(md)[0] is True
+
+
+def test_math_alphanumeric_symbols_not_garbled():
+    # U+1D400-1D7FF (𝔼 𝒩 𝓛) are legitimate math notation, not garble
+    md = ("We estimate 𝔼[x] under 𝒩(0, I) and minimize the loss 𝓛(θ). " * 20)
+    assert looks_garbled(md) is False
+    assert needs_escalation(md)[0] is False
 
 
 def test_empty_output_is_safe():
