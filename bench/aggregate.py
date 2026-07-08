@@ -18,6 +18,8 @@ OPS_FIT = {
     "chandra": ("modified OpenRAIL-M (research/personal/<$2M)", "9.9 GB (hf)", "MPS w/ heavy CPU fallback — SLOW", "opt-in; subset only"),
     "mineru": ("AGPL-3.0", "~1.2B (vlm) or pipeline", "macOS/MPS", "GPU-class quality"),
     "glm_ocr_mlx": ("MIT weights / Apache code", "0.9B", "native MLX (direct-server path)", "best-Mac candidate"),
+    "olmocr2_mlx": ("Apache-2.0", "7B (4-bit)", "MLX BROKEN (Qwen2.5-VL)", "attempted; server crashes, generate empty — needs official olmocr pipeline"),
+    "lightonocr_mlx": ("Apache-2.0", "1B (4-bit)", "MLX BROKEN (degenerate)", "attempted; emits repeated-newline garbage via mlx-vlm"),
     "paddleocr_vl": ("Apache-2.0", "0.9B", "CPU wheel on Mac — SLOW (>5 min/pg)", "top leaderboard; subset only"),
 }
 
@@ -220,7 +222,14 @@ def write_report(agg: dict) -> None:
             "`marker` is a viable cross-platform alternative but GPL and slower "
             "cold-start. `mineru`/`chandra`/`paddleocr_vl` — despite topping GPU "
             "leaderboards — are **impractically slow on Apple Silicon** (CPU "
-            "fallback, >5 min/page) and are not worth bundling for Mac users.\n"
+            "fallback, >5 min/page). `olmocr2_mlx` and `lightonocr_mlx` were also "
+            "attempted but are NOT viable via mlx-vlm 0.6.4: olmOCR-2 "
+            "(Qwen2.5-VL-7B) crashes the mlx-vlm server (Stream(gpu) threading "
+            "bug) and yields empty output via direct generate; LightOnOCR-1B's "
+            "4-bit MLX quant emits degenerate output. Both would need their "
+            "official inference toolchains (olmOCR targets vLLM/CUDA). GLM-OCR is "
+            "the one strong specialist VLM that runs cleanly on Apple Silicon via "
+            "mlx-vlm out of the box.\n"
         )
 
     L.append("## Ranked results (mean of both judges)\n")

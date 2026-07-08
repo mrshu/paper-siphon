@@ -160,17 +160,17 @@ class MinerU(_SubprocessBackend):
         return _find_md(out)
 
 
-class GlmOcrMlx(_SubprocessBackend):
-    """GLM-OCR weights served via mlx-vlm's OpenAI-compatible server, driven
-    directly per page image. NOTE: this is the direct-server path — it does NOT
-    include GLM-OCR's official two-stage layout-detection SDK, so it is a lower
-    bound on the full pipeline's quality. Recorded transparently in the report.
+class _MlxServerBackend(_SubprocessBackend):
+    """Base for document VLMs served via mlx-vlm's OpenAI-compatible server,
+    driven directly per page image (full page → Markdown). This is the
+    direct-server path — it does NOT include any model's bespoke two-stage
+    layout SDK, so it is a lower bound on a model's full-pipeline quality.
+    Recorded transparently in the report. Subclasses set MODEL/PORT/name.
     """
-    name = "glm_ocr_mlx"
     modules = ("mlx_vlm",)
-    MODEL = "mlx-community/GLM-OCR-bf16"
+    MODEL = "override"
     PORT = 8123
-    _server = None
+    _server = None  # each subclass overrides with its own class attribute
 
     OCR_PROMPT = (
         "Convert this document page image to clean GitHub-flavored Markdown. "
@@ -180,7 +180,7 @@ class GlmOcrMlx(_SubprocessBackend):
     )
 
     def ensure(self) -> Path:
-        vdir = uv_venv(self.name, python="3.12")
+        vdir = uv_venv("glm_ocr_mlx", python="3.12")  # shared mlx-vlm env
         if not has_import(vdir, "mlx_vlm"):
             uv_pip(vdir, "mlx-vlm>=0.3.11")
         return vdir
@@ -190,30 +190,30 @@ class GlmOcrMlx(_SubprocessBackend):
         import time
         import urllib.request
 
-        if GlmOcrMlx._server and GlmOcrMlx._server.poll() is None:
+        cls = type(self)
+        if cls._server and cls._server.poll() is None:
             return
-        log_path = BENCH / "outputs" / "_scratch" / "glm_server.log"
+        log_path = BENCH / "outputs" / "_scratch" / f"{self.name}_server.log"
         log_path.parent.mkdir(parents=True, exist_ok=True)
         fh = open(log_path, "w")
-        GlmOcrMlx._server = subprocess.Popen(
+        cls._server = subprocess.Popen(
             [str(vdir / "bin" / "python"), "-m", "mlx_vlm.server",
              "--model", self.MODEL, "--port", str(self.PORT),
              "--trust-remote-code", "--log-level", "WARNING"],
             stdout=fh, stderr=subprocess.STDOUT,
         )
         atexit.register(self.stop)
-        # wait for readiness (model download can take minutes on first run)
-        deadline = time.time() + 1200
+        deadline = time.time() + 1800  # first-run model download can be slow
         url = f"http://localhost:{self.PORT}/v1/models"
         while time.time() < deadline:
-            if GlmOcrMlx._server.poll() is not None:
+            if cls._server.poll() is not None:
                 raise RuntimeError(f"mlx_vlm.server exited early; see {log_path}")
             try:
                 urllib.request.urlopen(url, timeout=3)
                 return
             except Exception:
                 time.sleep(3)
-        raise RuntimeError("mlx_vlm.server did not become ready within 1200s")
+        raise RuntimeError("mlx_vlm.server did not become ready within 1800s")
 
     @classmethod
     def stop(cls) -> None:
@@ -259,10 +259,55 @@ class GlmOcrMlx(_SubprocessBackend):
         self._start_server(vdir)
         img_dir = _scratch(self.name) / pdf_path.stem
         pages = render_all_pages(pdf_path, img_dir, dpi=150, cap=30)
-        parts = []
-        for img in pages:
-            parts.append(self._ocr_page(img).strip())
+        return "\n\n".join(self._ocr_page(img).strip() for img in pages)
+
+
+class GlmOcrMlx(_MlxServerBackend):
+    name = "glm_ocr_mlx"
+    MODEL = "mlx-community/GLM-OCR-bf16"
+    PORT = 8123
+    _server = None
+
+
+class OlmOcr2Mlx(_MlxServerBackend):
+    """olmOCR-2-7B (Qwen2.5-VL-7B fine-tune, Apache-2.0), 4-bit MLX quant.
+
+    Uses the IN-PROCESS mlx_vlm.generate runner (not the server): mlx_vlm.server
+    runs inference in worker threads, which crashes on Qwen2.5-VL with
+    'RuntimeError: There is no Stream(gpu, N) in current thread'. The runner
+    loads the model once (per PDF) on the main thread and generates per page.
+    """
+    name = "olmocr2_mlx"
+    MODEL = "mlx-community/olmOCR-2-7B-1025-4bit"
+    PORT = 8124
+    _server = None
+
+    def convert(self, pdf_path: Path) -> str:
+        from lib import render_all_pages
+
+        vdir = self.ensure()
+        img_dir = _scratch(self.name) / pdf_path.stem
+        pages = render_all_pages(pdf_path, img_dir, dpi=150, cap=30)
+        runner = Path(__file__).resolve().parent / "mlx_generate_runner.py"
+        proc = subprocess.run(
+            [str(vdir / "bin" / "python"), str(runner), self.MODEL,
+             *[str(p) for p in pages]],
+            capture_output=True, text=True, timeout=CONVERT_TIMEOUT,
+        )
+        if proc.returncode != 0:
+            raise RuntimeError(f"mlx_generate_runner failed: {proc.stderr[-500:]}")
+        parts = [p.strip() for p in proc.stdout.split("<<<PAGE_DELIM>>>") if p.strip()]
+        if not parts:
+            raise RuntimeError("mlx_generate_runner produced no output")
         return "\n\n".join(parts)
+
+
+class LightOnOcrMlx(_MlxServerBackend):
+    """LightOnOCR-1B (small 1B end-to-end OCR VLM), 4-bit MLX quant."""
+    name = "lightonocr_mlx"
+    MODEL = "mlx-community/LightOnOCR-1B-1025-4bit"
+    PORT = 8125
+    _server = None
 
 
 class PaddleOcrVl(_SubprocessBackend):

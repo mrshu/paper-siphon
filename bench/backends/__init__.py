@@ -12,7 +12,9 @@ An adapter is any object with:
 from __future__ import annotations
 
 from .docling_baselines import DoclingStandard, GraniteDoclingMLX
-from .subprocess_backends import Chandra, GlmOcrMlx, Marker, MinerU, PaddleOcrVl
+from .subprocess_backends import (
+    Chandra, GlmOcrMlx, LightOnOcrMlx, Marker, MinerU, OlmOcr2Mlx, PaddleOcrVl,
+)
 
 ALL = [
     DoclingStandard(),
@@ -21,6 +23,8 @@ ALL = [
     Chandra(),
     MinerU(),
     GlmOcrMlx(),
+    OlmOcr2Mlx(),
+    LightOnOcrMlx(),
     PaddleOcrVl(),
 ]
 

@@ -10,7 +10,7 @@ Judge page sample: first 6 pages + up to 10 total incl. table/math pages, render
 
 The gap is largest on **math** (the current default drops display equations as `formula-not-decoded`) and on pathological font-encoding (the `ssl_2020_tigers` PDF, where the default emits scrambled glyphs — text recall 0.03 — while the VLM backends read it visually). `docling_standard` remains far the fastest (~0.6 s/page) and is the right default when speed dominates and papers are simple.
 
-**Recommendation:** add `glm_ocr_mlx` as a high-quality Apple-Silicon backend (near-SOTA quality at ~7 s/page, MIT weights, fits in 8 GB). `marker` is a viable cross-platform alternative but GPL and slower cold-start. `mineru`/`chandra`/`paddleocr_vl` — despite topping GPU leaderboards — are **impractically slow on Apple Silicon** (CPU fallback, >5 min/page) and are not worth bundling for Mac users.
+**Recommendation:** add `glm_ocr_mlx` as a high-quality Apple-Silicon backend (near-SOTA quality at ~7 s/page, MIT weights, fits in 8 GB). `marker` is a viable cross-platform alternative but GPL and slower cold-start. `mineru`/`chandra`/`paddleocr_vl` — despite topping GPU leaderboards — are **impractically slow on Apple Silicon** (CPU fallback, >5 min/page). `olmocr2_mlx` and `lightonocr_mlx` were also attempted but are NOT viable via mlx-vlm 0.6.4: olmOCR-2 (Qwen2.5-VL-7B) crashes the mlx-vlm server (Stream(gpu) threading bug) and yields empty output via direct generate; LightOnOCR-1B's 4-bit MLX quant emits degenerate output. Both would need their official inference toolchains (olmOCR targets vLLM/CUDA). GLM-OCR is the one strong specialist VLM that runs cleanly on Apple Silicon via mlx-vlm out of the box.
 
 ## Ranked results (mean of both judges)
 
@@ -21,8 +21,10 @@ The gap is largest on **math** (the current default drops display equations as `
 | 3 | `granite_docling_mlx` | **5.93** | 6.79 | 4.21 | 5.89 | 6.82 | 0.25 | 0.25 | 16.8 |
 | 4 | `docling_standard` | **4.58** | 6.04 | 4.54 | 2.39 | 5.36 | 0.155 | 0.155 | 0.6 |
 | 5 | `chandra` | **—** | — | — | — | — | — | — | — |
-| 6 | `mineru` | **—** | — | — | — | — | — | — | — |
-| 7 | `paddleocr_vl` | **—** | — | — | — | — | — | — | — |
+| 6 | `lightonocr_mlx` | **—** | — | — | — | — | — | — | — |
+| 7 | `mineru` | **—** | — | — | — | — | — | — | — |
+| 8 | `olmocr2_mlx` | **—** | — | — | — | — | — | — | — |
+| 9 | `paddleocr_vl` | **—** | — | — | — | — | — | — | — |
 
 *Caveat on the **tables** axis: it reads low for every backend because many judged page-samples (first ~6-10 pages) contain no table, and the two judges handled 'no table visible' differently — codex scored 0, Claude scored a neutral ~5 (see the disagreements list). Treat absolute table scores with caution; the relative ordering still holds.*
 
@@ -36,7 +38,9 @@ The gap is largest on **math** (the current default drops display equations as `
 | `granite_docling_mlx` | 6.16 | 5.7 |
 | `docling_standard` | 4.62 | 4.54 |
 | `chandra` | — | — |
+| `lightonocr_mlx` | — | — |
 | `mineru` | — | — |
+| `olmocr2_mlx` | — | — |
 | `paddleocr_vl` | — | — |
 
 ## Speed (Apple Silicon M4 Max — a primary deciding factor)
@@ -60,7 +64,9 @@ The gap is largest on **math** (the current default drops display equations as `
 | `granite_docling_mlx` | 0.88 | 0.0 | 0.005 | 3135.543 |
 | `docling_standard` | 0.843 | 0.0 | 0.047 | 3173.436 |
 | `chandra` | — | — | — | — |
+| `lightonocr_mlx` | — | — | — | — |
 | `mineru` | — | — | — | — |
+| `olmocr2_mlx` | — | — | — | — |
 | `paddleocr_vl` | — | — | — | — |
 
 ## Per-tag overall (where does an edge concentrate?)
@@ -72,11 +78,15 @@ The gap is largest on **math** (the current default drops display equations as `
 | `granite_docling_mlx` | 4.88 | 5.12 | 6.22 | 5.88 | 5.9 | 6.38 | 6.35 | 5.38 | 6.31 | 4.88 | 6.02 |
 | `docling_standard` | 5.5 | 2.62 | 4.17 | 3.75 | 5.1 | 4.12 | 5.73 | 2.75 | 4.56 | 5.25 | 4.68 |
 | `chandra` | — | — | — | — | — | — | — | — | — | — | — |
+| `lightonocr_mlx` | — | — | — | — | — | — | — | — | — | — | — |
 | `mineru` | — | — | — | — | — | — | — | — | — | — | — |
+| `olmocr2_mlx` | — | — | — | — | — | — | — | — | — | — | — |
 | `paddleocr_vl` | — | — | — | — | — | — | — | — | — | — | — |
 
 ## Availability & errors
 
+- `lightonocr_mlx`: 14 failures — e.g. ssl_2025_first_order: not viable via mlx-vlm 0.6.4: 4-bit MLX quant emits degenerate repeated-newline 
+- `olmocr2_mlx`: 14 failures — e.g. ssl_2025_first_order: not viable via mlx-vlm 0.6.4 on Apple Silicon: server crashes (Stream(gpu) threa
 - `mineru`: 3 failures — e.g. ssl_2020_tigers: excluded: TimeoutExpired >1800s on 2 pages (model download + CPU inference)
 - `paddleocr_vl`: 3 failures — e.g. ssl_2020_tigers: excluded: >5 min/page (CPU-only wheel on Mac), smoke unfinished after 10 min
 - `chandra`: 3 failures — e.g. ssl_2020_tigers: excluded: >7 min/page, 2-page smoke unfinished after 15 min (9.9GB model, CPU fa
@@ -90,7 +100,9 @@ The gap is largest on **math** (the current default drops display equations as `
 | `granite_docling_mlx` | Apache-2.0 | 258M | native MLX | current --vlm |
 | `docling_standard` | MIT | small (docling models) | native | current default |
 | `chandra` | modified OpenRAIL-M (research/personal/<$2M) | 9.9 GB (hf) | MPS w/ heavy CPU fallback — SLOW | opt-in; subset only |
+| `lightonocr_mlx` | Apache-2.0 | 1B (4-bit) | MLX BROKEN (degenerate) | attempted; emits repeated-newline garbage via mlx-vlm |
 | `mineru` | AGPL-3.0 | ~1.2B (vlm) or pipeline | macOS/MPS | GPU-class quality |
+| `olmocr2_mlx` | Apache-2.0 | 7B (4-bit) | MLX BROKEN (Qwen2.5-VL) | attempted; server crashes, generate empty — needs official olmocr pipeline |
 | `paddleocr_vl` | Apache-2.0 | 0.9B | CPU wheel on Mac — SLOW (>5 min/pg) | top leaderboard; subset only |
 
 ## Judge disagreements (>2 pts, for spot-check)
