@@ -1,7 +1,6 @@
 """Paper Siphon - Extract clean Markdown from academic PDFs."""
 
 import logging
-import platform
 import sys
 import tempfile
 import urllib.request
@@ -16,16 +15,14 @@ from docling.datamodel.pipeline_options import (
     PdfPipelineOptions,
     TableFormerMode,
     TableStructureOptions,
-    VlmPipelineOptions,
 )
 from docling.document_converter import DocumentConverter, PdfFormatOption
-from docling.pipeline.vlm_pipeline import VlmPipeline
 
+from paper_siphon.backends import vlm_backend_name, vlm_convert
 from paper_siphon.cleaning import clean_markdown
+from paper_siphon.quality import needs_escalation
 
 logger = logging.getLogger(__name__)
-
-MLX_AVAILABLE = platform.system() == "Darwin" and platform.machine() == "arm64"
 
 
 def is_url(source: str) -> bool:
@@ -87,42 +84,11 @@ def create_standard_converter(enrich_formula: bool) -> DocumentConverter:
     )
 
 
-def create_vlm_converter(use_mlx: bool, enrich_formula: bool) -> DocumentConverter:
-    """Create a converter using the VLM pipeline.
-
-    Args:
-        use_mlx: Use MLX acceleration (Apple Silicon only).
-        enrich_formula: Enable formula enrichment.
-
-    Raises:
-        ImportError: If MLX is requested but mlx-vlm is not installed.
-        RuntimeError: If MLX is requested on non-Apple Silicon hardware.
-    """
-    from docling.datamodel import vlm_model_specs
-
-    if use_mlx:
-        if not MLX_AVAILABLE:
-            raise RuntimeError("MLX requires Apple Silicon (arm64 macOS)")
-        try:
-            vlm_options = vlm_model_specs.GRANITEDOCLING_MLX
-        except AttributeError:
-            raise ImportError(
-                "mlx-vlm not installed. Install with: uv pip install mlx-vlm"
-            )
-    else:
-        vlm_options = vlm_model_specs.GRANITEDOCLING_TRANSFORMERS
-
-    pipeline_options = VlmPipelineOptions(
-        vlm_options=vlm_options,
-        do_formula_enrichment=enrich_formula,
-    )
-    return DocumentConverter(
-        format_options={
-            InputFormat.PDF: PdfFormatOption(
-                pipeline_cls=VlmPipeline, pipeline_options=pipeline_options
-            ),
-        }
-    )
+def convert_standard(file_path: Path, enrich_formula: bool) -> str:
+    """Run the fast default Docling pipeline; return raw Markdown."""
+    converter = create_standard_converter(enrich_formula=enrich_formula)
+    result = converter.convert(file_path)
+    return result.document.export_to_markdown()
 
 
 @click.command()
@@ -139,18 +105,26 @@ def create_vlm_converter(use_mlx: bool, enrich_formula: bool) -> DocumentConvert
     "--vlm",
     is_flag=True,
     default=False,
-    help="Use VLM pipeline (slower but better for complex layouts).",
+    help="Use the VLM backend (GLM-OCR on Apple Silicon, marker elsewhere) — "
+    "slower but much better on complex layouts, math, and bad encodings.",
 )
 @click.option(
     "--mlx/--no-mlx",
     default=True,
-    help="Use MLX acceleration on Apple Silicon. Only applies with --vlm.",
+    help="Use MLX (GLM-OCR) on Apple Silicon for the VLM path. "
+    "--no-mlx forces the marker backend even on a Mac.",
+)
+@click.option(
+    "--escalate/--no-escalate",
+    default=True,
+    help="Auto-retry with the VLM backend when the default output looks "
+    "garbled or drops equations (default: on).",
 )
 @click.option(
     "--enrich-formula",
     is_flag=True,
     default=False,
-    help="Enable formula enrichment (slow, runs on CPU).",
+    help="Enable formula enrichment on the default pipeline (slow, runs on CPU).",
 )
 @click.option(
     "-v",
@@ -165,6 +139,7 @@ def main(
     output: Path | None,
     vlm: bool,
     mlx: bool,
+    escalate: bool,
     enrich_formula: bool,
     verbose: bool,
 ) -> None:
@@ -203,15 +178,21 @@ def main(
 
         try:
             if vlm:
-                mode = "VLM + MLX" if mlx else "VLM + CPU"
-                click.echo(f"Using {mode} pipeline")
-                converter = create_vlm_converter(use_mlx=mlx, enrich_formula=enrich_formula)
+                click.echo(f"Using VLM backend: {vlm_backend_name(mlx)}")
+                markdown = vlm_convert(file_path, use_mlx=mlx)
             else:
                 click.echo("Using standard pipeline (accurate table mode)")
-                converter = create_standard_converter(enrich_formula=enrich_formula)
+                markdown = convert_standard(file_path, enrich_formula=enrich_formula)
 
-            result = converter.convert(file_path)
-        except (ImportError, RuntimeError) as e:
+                if escalate:
+                    should, reason = needs_escalation(markdown)
+                    if should:
+                        click.echo(
+                            f"Default {reason}; re-running with "
+                            f"{vlm_backend_name(mlx)}"
+                        )
+                        markdown = vlm_convert(file_path, use_mlx=mlx)
+        except ImportError as e:
             click.echo(f"Error: {e}", err=True)
             sys.exit(1)
         except Exception as e:
@@ -219,7 +200,6 @@ def main(
             click.echo(f"Error: Conversion failed - {e}", err=True)
             sys.exit(1)
 
-        markdown = result.document.export_to_markdown()
         cleaned = clean_markdown(markdown)
 
         output.write_text(cleaned)

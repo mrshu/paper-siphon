@@ -9,8 +9,10 @@ dependencies = [
     "docling>=2.0",
 ]
 
-[project.optional-dependencies]
-mlx = ["mlx-vlm>=0.3"]
+# The --vlm backends (GLM-OCR on Apple Silicon, marker elsewhere) are NOT
+# optional dependencies: they run in an isolated `uv run --with` environment so
+# their newer transformers pin cannot break Docling's default pipeline. The
+# --vlm path only requires `uv` on PATH.
 
 [project.scripts]
 paper-siphon = "paper_siphon.cli:main"
