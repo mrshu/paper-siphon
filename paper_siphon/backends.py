@@ -67,7 +67,12 @@ def _run_isolated(cmd: list[str], backend: str) -> subprocess.CompletedProcess:
             errors="replace", timeout=_VLM_TIMEOUT,
         )
     except subprocess.TimeoutExpired as e:
-        tail = (e.stderr or "")[-1200:] if isinstance(e.stderr, str) else ""
+        # TimeoutExpired.stderr is bytes even under text=True; decode it so the
+        # diagnostic tail is not silently dropped.
+        err = e.stderr
+        if isinstance(err, (bytes, bytearray)):
+            err = err.decode("utf-8", "replace")
+        tail = (err or "")[-1200:] if isinstance(err, str) else ""
         raise VlmBackendError(
             f"{backend} backend timed out after {_VLM_TIMEOUT}s"
             + (f":\n{tail}" if tail else "")

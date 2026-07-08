@@ -168,6 +168,28 @@ def test_marker_command_forces_ocr(tmp_path):
     assert "--isolated" in captured["cmd"]
 
 
+def test_output_written_as_utf8(cli_runner, tmp_path):
+    # non-ASCII VLM/standard output must round-trip regardless of locale
+    out = tmp_path / "o.md"
+    text = "Estimate 𝔼[x] under 𝒩(0, I); α → β. Ünïcödé."
+    with patch("paper_siphon.cli.convert_standard", return_value=text):
+        result = cli_runner.invoke(main, [str(_pdf(tmp_path)), "-o", str(out)])
+    assert result.exit_code == 0, result.output
+    assert out.read_text(encoding="utf-8") == text.strip() + "\n" or text in out.read_text(encoding="utf-8")
+
+
+def test_timeout_includes_stderr_tail():
+    import subprocess as sp
+
+    def boom(cmd, **kwargs):
+        raise sp.TimeoutExpired(cmd, 1, stderr=b"download stalled at 70%")
+
+    with patch.object(backends.shutil, "which", return_value="/usr/bin/uv"), \
+         patch.object(backends.subprocess, "run", boom):
+        with pytest.raises(VlmBackendError, match="stalled at 70"):
+            backends.glm_ocr_convert(Path("paper.pdf"))
+
+
 def test_marker_empty_output_raises(tmp_path):
     # an empty marker result is an operational failure, not usable output
     def fake_run(cmd, **kwargs):

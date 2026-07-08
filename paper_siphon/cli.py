@@ -216,7 +216,7 @@ def main(
 
         cleaned = clean_markdown(markdown)
 
-        output.write_text(cleaned)
+        output.write_text(cleaned, encoding="utf-8")
         click.echo(f"Done! Output saved to {output}")
 
 
