@@ -1,0 +1,39 @@
+{
+  "scores": {
+    "A": {
+      "text": 7,
+      "tables": 2,
+      "math": 2,
+      "structure": 5,
+      "evidence": "Prose mostly present but Pieter Abbeel is moved after page 1, 'Wepresent' and glyph artifacts appear; most equations are formula-not-decoded and Tables 1/2 are merged into a mangled multi-column table."
+    },
+    "B": {
+      "text": 7,
+      "tables": 3,
+      "math": 7,
+      "structure": 6,
+      "evidence": "Good prose and many equations, but author/email text is partly dropped, a section 3.2 paragraph is skipped, Algorithm 2 math is garbled, and Tables 1/2 are partially merged with Table 2 text inside Table 1."
+    },
+    "C": {
+      "text": 9,
+      "tables": 0,
+      "math": 7,
+      "structure": 8,
+      "evidence": "Clean reading order and prose with usable algorithms, but visible Tables 1/2 are missing and several formulas have wrong indices such as alpha_t-1 vs alpha_{t-1} and simplified-objective bars lost."
+    },
+    "D": {
+      "text": 9,
+      "tables": 0,
+      "math": 8,
+      "structure": 8,
+      "evidence": "Strong prose, headings, and LaTeX with minor equation/index errors and algorithms flattened into one heading line; no visible Tables 1/2 are captured in the provided output."
+    }
+  },
+  "ranking": [
+    "D",
+    "C",
+    "B",
+    "A"
+  ],
+  "judge": "codex"
+}

@@ -1,0 +1,34 @@
+{
+  "judge": "claude",
+  "scores": {
+    "A": {
+      "text": 9,
+      "tables": 5,
+      "math": 9,
+      "structure": 9,
+      "evidence": "Faithful prose, footnote preserved; equations rendered as LaTeX with all \\tag numbers (1)-(7); consistent ### heading hierarchy; only nit is degree shown as \\u25e6 ring instead of °."
+    },
+    "B": {
+      "text": 6,
+      "tables": 5,
+      "math": 7,
+      "structure": 8,
+      "evidence": "Degree symbol corrupted to literal 'GLYPH' three times (0.087 GLYPH, 0.17 GLYPH); spurious 'Line chart' inserted before Fig 9; 'Rong Xiong1' missing superscript; equations correct LaTeX but lack equation numbers."
+    },
+    "C": {
+      "text": 9,
+      "tables": 5,
+      "math": 9,
+      "structure": 8,
+      "evidence": "Clean faithful prose with curly quotes; equations as LaTeX with numbers and correct degree symbol $0.087^\\circ$; headings present but inconsistent markup (plain '1 Introduction' without #)."
+    },
+    "D": {
+      "text": 4,
+      "tables": 4,
+      "math": 2,
+      "structure": 3,
+      "evidence": "All equations lost to '<!-- formula-not-decoded -->'; block-diagram box labels dumped mid-sentence ('Decision layer...Global vision from the original 360 lines') and plot axis numbers injected into prose, badly breaking reading order."
+    }
+  },
+  "ranking": ["A", "C", "B", "D"]
+}

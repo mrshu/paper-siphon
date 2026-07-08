@@ -1,0 +1,39 @@
+{
+  "scores": {
+    "A": {
+      "text": 8,
+      "tables": 2,
+      "math": 7,
+      "structure": 8,
+      "evidence": "Mostly faithful prose and order, but title/OCR glitches like 'b y' and 'no toriously'; Algorithm 1 is reduced to a broken array/input stub, while most displayed equations before it are usable."
+    },
+    "B": {
+      "text": 9,
+      "tables": 8,
+      "math": 8,
+      "structure": 8,
+      "evidence": "Clean prose and Algorithm 1 is structurally complete, but section 2 heading is missing and some gradient equations are wrong/sign-lost near the chain rule."
+    },
+    "C": {
+      "text": 5,
+      "tables": 0,
+      "math": 1,
+      "structure": 3,
+      "evidence": "Starts with right-column text before Abstract/Introduction, many equations and Algorithm 1 are replaced by '<!-- formula-not-decoded -->', and math symbols are often OCR gibberish like '/lscript'."
+    },
+    "D": {
+      "text": 6,
+      "tables": 2,
+      "math": 5,
+      "structure": 5,
+      "evidence": "Prose is mostly present but Christian Szegedy is inserted mid-introduction, OCR errors appear ('Simodaira'), and Algorithm 1 is malformed with the mean step missing and variance duplicated."
+    }
+  },
+  "ranking": [
+    "B",
+    "A",
+    "D",
+    "C"
+  ],
+  "judge": "codex"
+}

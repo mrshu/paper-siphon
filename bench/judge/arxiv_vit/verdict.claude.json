@@ -1,0 +1,34 @@
+{
+  "judge": "claude",
+  "scores": {
+    "A": {
+      "text": 9,
+      "tables": 2,
+      "math": 10,
+      "structure": 8,
+      "evidence": "Prose faithful and footnote inlined correctly; all four equations rendered as clean numbered LaTeX (z_0=[x_class;...], y=LN(z_L^0)), but Table 1 is entirely omitted (text jumps from the datasets paragraph straight to the VTAB paragraph)."
+    },
+    "B": {
+      "text": 9,
+      "tables": 10,
+      "math": 2,
+      "structure": 8,
+      "evidence": "Table 1 rendered as a correct markdown grid (Base 12/768/3072/12/86M etc.), but equations 1-3 are emitted as '<!-- formula-not-decoded -->' and Eq. 4 is shattered into single-character lines (y / = LN( / z / L / )), so the method math is lost."
+    },
+    "C": {
+      "text": 8,
+      "tables": 10,
+      "math": 10,
+      "structure": 9,
+      "evidence": "All four equations in faithful LaTeX with proper \\mathbf/\\mathbb and Table 1 correct; only blemish is pervasive citation-link/anchor markup noise like '[\\(Vaswani et al., 2017\\)](#page-11-0)' peppered through the prose."
+    },
+    "D": {
+      "text": 7,
+      "tables": 5,
+      "math": 7,
+      "structure": 8,
+      "evidence": "Table 1 columns misaligned ('Hidden size' and 'D' split into two columns, values shifted, Params left empty); Eq. 2 shows 'MS(' instead of 'MSA(' and prose has scrambled glyph 'multihedead selfattention'; text otherwise readable."
+    }
+  },
+  "ranking": ["C", "A", "B", "D"]
+}

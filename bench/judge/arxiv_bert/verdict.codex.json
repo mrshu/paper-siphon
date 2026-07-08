@@ -1,0 +1,39 @@
+{
+  "scores": {
+    "A": {
+      "text": 7,
+      "tables": 0,
+      "math": 5,
+      "structure": 6,
+      "evidence": "Mostly faithful prose through page 5, but Figure 1 diagram OCR junk is inserted as text and several spacing/OCR issues like 'Weshow' and split BERT acronym."
+    },
+    "B": {
+      "text": 9,
+      "tables": 0,
+      "math": 8,
+      "structure": 9,
+      "evidence": "Clean prose and correct column reading order through page 5; figures are reduced to captions, inline math like C in R^H and T_i is usable, but visible later tables are absent from the provided start."
+    },
+    "C": {
+      "text": 7,
+      "tables": 0,
+      "math": 5,
+      "structure": 7,
+      "evidence": "Text is mostly present but cluttered with excessive citation anchors and malformed footnote markup; some math is degraded as plain 'R H'/'T^i' and headings are inconsistent."
+    },
+    "D": {
+      "text": 6,
+      "tables": 0,
+      "math": 4,
+      "structure": 7,
+      "evidence": "Prose is mostly in order but has OCR errors such as 'Dai and Lee', 'Jernite al.', and 'I_i' for T_i; math symbols like R^H are mangled and visible later tables are missing."
+    }
+  },
+  "ranking": [
+    "B",
+    "C",
+    "A",
+    "D"
+  ],
+  "judge": "codex"
+}

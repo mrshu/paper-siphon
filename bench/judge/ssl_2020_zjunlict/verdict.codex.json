@@ -1,0 +1,39 @@
+{
+  "scores": {
+    "A": {
+      "text": 9,
+      "tables": 0,
+      "math": 10,
+      "structure": 8,
+      "evidence": "Prose and equations 1-7 are faithful, but visible Algorithm 1 table is absent and page header '4 Z. Huang et al.' is misread as a heading."
+    },
+    "B": {
+      "text": 8,
+      "tables": 0,
+      "math": 8,
+      "structure": 8,
+      "evidence": "Mostly complete prose, but degree symbols become GLYPH, equations lose numbering, and visible Algorithm 1 table is absent."
+    },
+    "C": {
+      "text": 9,
+      "tables": 0,
+      "math": 9,
+      "structure": 8,
+      "evidence": "Strong prose and inline math, with minor heading inconsistency and missing equation numbers for 1-2; visible Algorithm 1 table is absent."
+    },
+    "D": {
+      "text": 5,
+      "tables": 0,
+      "math": 1,
+      "structure": 4,
+      "evidence": "Figure text and chart ticks are merged into prose, '3-4 frames' becomes '34', equations are formula-not-decoded, and visible Algorithm 1 table is absent."
+    }
+  },
+  "ranking": [
+    "A",
+    "C",
+    "B",
+    "D"
+  ],
+  "judge": "codex"
+}

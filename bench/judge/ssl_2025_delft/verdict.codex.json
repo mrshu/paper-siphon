@@ -1,0 +1,39 @@
+{
+  "scores": {
+    "A": {
+      "text": 8,
+      "tables": 10,
+      "math": 7,
+      "structure": 8,
+      "evidence": "Mostly faithful for shown pages, but misses visible PCIe-connector paragraph on page 6, has malformed bullets and spaced-out equation symbols."
+    },
+    "B": {
+      "text": 9,
+      "tables": 10,
+      "math": 9,
+      "structure": 9,
+      "evidence": "Very faithful prose and hierarchy for shown pages; equation is clean LaTeX, with only minor caption/image omissions and a questionable time-delay formula beyond page 8 sample."
+    },
+    "C": {
+      "text": 8,
+      "tables": 10,
+      "math": 8,
+      "structure": 7,
+      "evidence": "Good prose and math on shown pages, but page headers like '4 The Delft Mercurians' become headings and figure/page anchors interrupt reading order."
+    },
+    "D": {
+      "text": 7,
+      "tables": 10,
+      "math": 4,
+      "structure": 6,
+      "evidence": "Prose mostly present, but page headers are merged, figure OCR text intrudes into flow, bullets are malformed, and the page 8 equation is replaced by formula-not-decoded."
+    }
+  },
+  "ranking": [
+    "B",
+    "C",
+    "A",
+    "D"
+  ],
+  "judge": "codex"
+}

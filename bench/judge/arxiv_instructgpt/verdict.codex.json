@@ -1,0 +1,39 @@
+{
+  "scores": {
+    "A": {
+      "text": 8,
+      "tables": 0,
+      "math": 4,
+      "structure": 8,
+      "evidence": "Strong prose and order through Related work, but noisy citation links and a garbled footnote marker; visible Tables 1-3 and equations are absent from the shown output."
+    },
+    "B": {
+      "text": 8,
+      "tables": 0,
+      "math": 4,
+      "structure": 8,
+      "evidence": "Faithful prose with minor spacing/OCR issues such as 'Agoal' and lost italics; visible tables and displayed equations from later shown pages are absent."
+    },
+    "C": {
+      "text": 9,
+      "tables": 0,
+      "math": 5,
+      "structure": 8,
+      "evidence": "Best prose fidelity and preserves bold lead sentences plus inline math like 85\u00b13%, but has one dropped word in 'prefer InstructGPT outputs from GPT-3'; visible tables/equations are absent."
+    },
+    "D": {
+      "text": 7,
+      "tables": 1,
+      "math": 4,
+      "structure": 8,
+      "evidence": "Good order but has OCR/content errors such as 'Tamarin' for Tamkin and '100 fewer parameters'; author block is a table but actual visible Tables 1-3 and equations are absent."
+    }
+  },
+  "ranking": [
+    "C",
+    "B",
+    "A",
+    "D"
+  ],
+  "judge": "codex"
+}

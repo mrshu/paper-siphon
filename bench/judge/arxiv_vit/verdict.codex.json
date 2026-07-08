@@ -1,0 +1,39 @@
+{
+  "scores": {
+    "A": {
+      "text": 9,
+      "tables": 0,
+      "math": 9,
+      "structure": 8,
+      "evidence": "Prose and equations 1-4 are faithful, but visible Table 1 is entirely missing and heading levels are inconsistent."
+    },
+    "B": {
+      "text": 8,
+      "tables": 8,
+      "math": 3,
+      "structure": 8,
+      "evidence": "Good prose and Table 1, but equations 1-3 are replaced by formula-not-decoded and inline math is flattened with spacing artifacts."
+    },
+    "C": {
+      "text": 9,
+      "tables": 9,
+      "math": 9,
+      "structure": 8,
+      "evidence": "Faithful prose, Table 1, and equations; minor citation/link clutter and some odd heading levels around Method/Setup."
+    },
+    "D": {
+      "text": 8,
+      "tables": 4,
+      "math": 6,
+      "structure": 8,
+      "evidence": "Prose mostly intact, but Table 1 columns are shifted/mislabeled and equation 2 drops MSA to MS with other math formatting damage."
+    }
+  },
+  "ranking": [
+    "C",
+    "A",
+    "B",
+    "D"
+  ],
+  "judge": "codex"
+}
