@@ -59,8 +59,12 @@ def _run_isolated(cmd: list[str], backend: str) -> subprocess.CompletedProcess:
     to VlmBackendError with a useful stderr tail."""
     try:
         proc = subprocess.run(
+            # errors="replace" so a stray non-UTF-8 byte in stdout/stderr can
+            # never raise UnicodeDecodeError mid-capture — that would escape the
+            # VlmBackendError contract and abort auto-escalation instead of
+            # falling back to the standard output.
             cmd, capture_output=True, text=True, encoding="utf-8",
-            timeout=_VLM_TIMEOUT,
+            errors="replace", timeout=_VLM_TIMEOUT,
         )
     except subprocess.TimeoutExpired as e:
         tail = (e.stderr or "")[-1200:] if isinstance(e.stderr, str) else ""
@@ -68,6 +72,8 @@ def _run_isolated(cmd: list[str], backend: str) -> subprocess.CompletedProcess:
             f"{backend} backend timed out after {_VLM_TIMEOUT}s"
             + (f":\n{tail}" if tail else "")
         ) from e
+    except OSError as e:  # exec failure, etc. — an operational backend failure
+        raise VlmBackendError(f"{backend} backend could not start: {e}") from e
     if proc.returncode != 0:
         raise VlmBackendError(f"{backend} backend failed:\n{proc.stderr[-1200:]}")
     return proc
@@ -82,6 +88,10 @@ def glm_ocr_convert(pdf_path: Path) -> str:
     _require_uv()
     proc = _run_isolated(
         [
+            # Pin to a known-good interpreter (uv fetches it if absent) so the
+            # ephemeral env is reproducible rather than tracking whatever
+            # interpreter uv would otherwise pick (possibly too new for the
+            # mlx-vlm/torch stack).
             "uv", "run", "--isolated", "--no-project", "--python", "3.12",
             "--with", "mlx-vlm>=0.3.11,<0.7", "--with", "pymupdf",
             "python", str(_RUNNER), str(pdf_path),
@@ -101,7 +111,9 @@ def marker_convert(pdf_path: Path) -> str:
     with tempfile.TemporaryDirectory() as td:
         _run_isolated(
             [
-                "uv", "run", "--isolated", "--no-project",
+                # Same known-good-interpreter pin as the GLM path for
+                # reproducibility of the isolated marker/torch env.
+                "uv", "run", "--isolated", "--no-project", "--python", "3.12",
                 "--with", "marker-pdf>=1.0,<2",
                 "marker_single", str(pdf_path),
                 "--output_dir", td,
@@ -117,12 +129,18 @@ def marker_convert(pdf_path: Path) -> str:
         )
         stem = Path(pdf_path).stem
         out = Path(td) / stem / f"{stem}.md"
-        if out.exists():
-            return out.read_text(encoding="utf-8")
-        mds = sorted(Path(td).rglob("*.md"), key=lambda p: -p.stat().st_size)
-        if not mds:
-            raise VlmBackendError("marker backend produced no Markdown output")
-        return mds[0].read_text(encoding="utf-8")
+        if not out.exists():
+            mds = sorted(Path(td).rglob("*.md"), key=lambda p: -p.stat().st_size)
+            if not mds:
+                raise VlmBackendError("marker backend produced no Markdown output")
+            out = mds[0]
+        md = out.read_text(encoding="utf-8")
+        # An empty result must be an operational failure (like GLM's empty-stdout
+        # guard) so auto-escalation falls back to the standard output instead of
+        # silently overwriting it with nothing.
+        if not md.strip():
+            raise VlmBackendError("marker backend produced empty Markdown")
+        return md
 
 
 def vlm_convert(pdf_path: Path, use_mlx: bool = True) -> str:

@@ -168,6 +168,36 @@ def test_marker_command_forces_ocr(tmp_path):
     assert "--isolated" in captured["cmd"]
 
 
+def test_marker_empty_output_raises(tmp_path):
+    # an empty marker result is an operational failure, not usable output
+    def fake_run(cmd, **kwargs):
+        td = cmd[cmd.index("--output_dir") + 1]
+        stem = Path(cmd[cmd.index("marker_single") + 1]).stem
+        d = Path(td) / stem
+        d.mkdir(parents=True, exist_ok=True)
+        (d / f"{stem}.md").write_text("   \n")  # whitespace only
+        class R:
+            returncode = 0
+            stderr = ""
+        return R()
+
+    with patch.object(backends, "is_apple_silicon", return_value=False), \
+         patch.object(backends.shutil, "which", return_value="/usr/bin/uv"), \
+         patch.object(backends.subprocess, "run", fake_run):
+        with pytest.raises(VlmBackendError, match="empty"):
+            backends.marker_convert(Path("paper.pdf"))
+
+
+def test_backend_wraps_oserror_as_vlmbackenderror():
+    def boom(cmd, **kwargs):
+        raise OSError("exec failed")
+
+    with patch.object(backends.shutil, "which", return_value="/usr/bin/uv"), \
+         patch.object(backends.subprocess, "run", boom):
+        with pytest.raises(VlmBackendError, match="could not start"):
+            backends.glm_ocr_convert(Path("paper.pdf"))
+
+
 def test_missing_backend_dependency_errors_cleanly(cli_runner, tmp_path):
     out = tmp_path / "o.md"
     with patch("paper_siphon.cli.vlm_convert", side_effect=VlmBackendError("install paper-siphon[marker]")):
