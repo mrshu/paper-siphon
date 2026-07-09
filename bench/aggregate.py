@@ -21,6 +21,13 @@ OPS_FIT = {
     "olmocr2_mlx": ("Apache-2.0", "7B (4-bit)", "MLX BROKEN (Qwen2.5-VL)", "attempted; server crashes, generate empty — needs official olmocr pipeline"),
     "lightonocr_mlx": ("Apache-2.0", "1B (4-bit)", "MLX BROKEN (degenerate)", "attempted; emits repeated-newline garbage via mlx-vlm"),
     "paddleocr_vl": ("Apache-2.0", "0.9B", "CPU wheel on Mac — SLOW (>5 min/pg)", "top leaderboard; subset only"),
+    # --- 2026-07-09 MLX re-run additions ---
+    "dots_ocr": ("MIT", "1.7B", "native MLX (bf16, --trust-remote-code)", "strong specialist; ~25 s/pg"),
+    "lightonocr2": ("Apache-2.0", "1B", "native MLX (bf16)", "v2 works (v1 was degenerate); slow ~77 s/pg"),
+    "paddleocr_vl_mlx": ("Apache-2.0", "0.9B", "native MLX (bf16)", "base PaddleOCR-VL; MLX fixes: idempotent sanitize + greedy decode"),
+    "paddleocr_vl_16": ("Apache-2.0", "0.9B", "native MLX (bf16)", "current 1.6 release; higher OmniDocBench, ~fast"),
+    "nanonets2": ("Apache-2.0", "3B", "MLX+MPS BROKEN (Qwen2.5-VL)", "attempted 3 paths (MLX bf16 empty, float32 gibberish) — needs vLLM/CUDA"),
+    "olmocr2": ("Apache-2.0", "7B (4-bit)", "MLX BROKEN (Qwen2.5-VL)", "attempted; near-empty even uncontended — needs official olmocr anchor-text pipeline"),
 }
 
 
@@ -128,7 +135,7 @@ def aggregate() -> dict:
             # Exclude wall-clock-inflated outliers (system sleep during the
             # unattended run pauses compute but not time.time()); >60 s/page for
             # a ~1B VLM on M4 Max is not real compute.
-            if m.get("s_per_page") is not None and m["s_per_page"] <= 60:
+            if m.get("s_per_page") is not None and m["s_per_page"] <= 120:
                 spp[b].append(m["s_per_page"])
                 if m.get("seconds") is not None:
                     secs[b].append(m["seconds"])
@@ -196,40 +203,37 @@ def write_report(agg: dict) -> None:
         cur_vlm = rows.get("granite_docling_mlx", {}).get("overall")
         tspd = agg["timing"].get(top, {}).get("s_per_page_median")
         vspd = agg["timing"].get("granite_docling_mlx", {}).get("s_per_page_median")
+        glm = rows.get("glm_ocr_mlx", {})
+        gspd = agg["timing"].get("glm_ocr_mlx", {}).get("s_per_page_median")
         L.append("## Bottom line\n")
         L.append(
-            f"**`{top}` wins.** Overall {tr['overall']}/10 (mean of both blinded "
-            f"judges), winning **{round((tr['winrate'] or 0)*100)}%** of head-to-head "
-            f"comparisons across {agg['n_papers_judged']} papers. That is "
-            + (f"**+{round(tr['overall']-cur_vlm,2)}** over the current `--vlm` "
-               f"(`granite_docling_mlx`, {cur_vlm}) and " if cur_vlm else "")
-            + (f"**+{round(tr['overall']-cur_def,2)}** over the current default "
-               f"(`docling_standard`, {cur_def})" if cur_def else "")
-            + f" — while being **faster** than the current VLM "
-              f"({tspd} vs {vspd} s/page median).\n"
+            f"**`{top}` wins on quality** — overall {tr['overall']}/10 (mean of both "
+            f"blinded judges), winning **{round((tr['winrate'] or 0)*100)}%** of "
+            f"head-to-head comparisons across {agg['n_papers_judged']} papers — "
+            f"**but it is slow** (~{tspd} s/page median). Its lead is on prose "
+            "fidelity and math; it captures full pages cleanly where the pipeline "
+            "backends drop equations.\n"
         )
         L.append(
-            "The gap is largest on **math** (the current default drops display "
-            "equations as `formula-not-decoded`) and on pathological font-encoding "
-            "(the `ssl_2020_tigers` PDF, where the default emits scrambled glyphs — "
-            "text recall 0.03 — while the VLM backends read it visually). "
-            "`docling_standard` remains far the fastest (~0.6 s/page) and is the "
-            "right default when speed dominates and papers are simple.\n"
+            f"**`glm_ocr_mlx` is the practical pick.** It is a close second on "
+            f"quality ({glm.get('overall')}/10) at **~{gspd} s/page** — roughly "
+            f"**{round((tspd or 1)/(gspd or 1))}× faster** than the winner — with MIT "
+            "weights and an 0.9B footprint that fits in 8 GB. `marker` is a viable "
+            "cross-platform third (GPL, slower cold-start). `dots_ocr` is a solid "
+            "MIT specialist but ~25 s/page.\n"
         )
         L.append(
-            "**Recommendation:** add `glm_ocr_mlx` as a high-quality Apple-Silicon "
-            "backend (near-SOTA quality at ~7 s/page, MIT weights, fits in 8 GB). "
-            "`marker` is a viable cross-platform alternative but GPL and slower "
-            "cold-start. `mineru`/`chandra`/`paddleocr_vl` — despite topping GPU "
-            "leaderboards — are **impractically slow on Apple Silicon** (CPU "
-            "fallback, >5 min/page). `olmocr2_mlx` and `lightonocr_mlx` were also "
-            "attempted but are NOT viable via mlx-vlm 0.6.4: olmOCR-2 "
-            "(Qwen2.5-VL-7B) crashes the mlx-vlm server (Stream(gpu) threading "
-            "bug) and yields empty output via direct generate; LightOnOCR-1B's "
-            "4-bit MLX quant emits degenerate output. Both would need their "
-            "official inference toolchains (olmOCR targets vLLM/CUDA). GLM-OCR is "
-            "the one strong specialist VLM that runs cleanly on Apple Silicon via "
-            "mlx-vlm out of the box.\n"
+            "**Notable failures.** Both `paddleocr_vl` versions score near the "
+            "bottom **despite topping OmniDocBench**: on this mlx-vlm path they "
+            "collapse into repetition loops, and 1.6 additionally floods the output "
+            "with raw `<|LOC_..|>` layout-coordinate tokens — a cautionary example "
+            "that leaderboard rank does not survive an unofficial Apple-Silicon "
+            "runtime. `nanonets2` and `olmocr2` (both Qwen2.5-VL OCR finetunes) were "
+            "attempted across three integration paths (MLX bf16, MLX 4-bit, native "
+            "float32) and produce empty or gibberish output via mlx-vlm/torch-MPS — "
+            "they need their official vLLM/CUDA toolchains. `docling_standard` "
+            "remains far the fastest (~0.6 s/page) and the right default when speed "
+            "dominates and papers are simple.\n"
         )
 
     L.append("## Ranked results (mean of both judges)\n")
