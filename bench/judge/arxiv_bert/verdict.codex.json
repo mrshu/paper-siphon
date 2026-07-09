@@ -1,39 +1,71 @@
 {
   "scores": {
     "A": {
-      "text": 7,
+      "text": 4,
       "tables": 0,
-      "math": 5,
-      "structure": 6,
-      "evidence": "Mostly faithful prose through page 5, but Figure 1 diagram OCR junk is inserted as text and several spacing/OCR issues like 'Weshow' and split BERT acronym."
+      "math": 2,
+      "structure": 3,
+      "evidence": "Early prose is mostly readable, but Figure 1 OCR explodes into hundreds of repeated 'NSP Mask LM' tokens and later visible tables/math are absent."
     },
     "B": {
-      "text": 9,
+      "text": 8,
       "tables": 0,
-      "math": 8,
-      "structure": 9,
-      "evidence": "Clean prose and correct column reading order through page 5; figures are reduced to captions, inline math like C in R^H and T_i is usable, but visible later tables are absent from the provided start."
+      "math": 5,
+      "structure": 8,
+      "evidence": "Good reading order through p5 with captions, but many dehyphenation/spacing errors and inline math like C in R^H is plain/misformatted; visible tables are absent."
     },
     "C": {
       "text": 7,
       "tables": 0,
       "math": 5,
       "structure": 7,
-      "evidence": "Text is mostly present but cluttered with excessive citation anchors and malformed footnote markup; some math is degraded as plain 'R H'/'T^i' and headings are inconsistent."
+      "evidence": "Mostly correct prose and order, but Figure 1 leaks OCR fragments like 'C E/CLST T', some words merge, and visible tables are absent."
     },
     "D": {
+      "text": 7,
+      "tables": 0,
+      "math": 5,
+      "structure": 7,
+      "evidence": "Similar to C with good prose/order, but has OCR mistakes such as 'Dai and Lee', wrong Ti as Ii, and no visible tables."
+    },
+    "E": {
+      "text": 8,
+      "tables": 0,
+      "math": 8,
+      "structure": 8,
+      "evidence": "Strong prose and usable LaTeX for C in R^H and T_i, but it drops the continuation before section 2 and visible result tables are absent."
+    },
+    "F": {
+      "text": 9,
+      "tables": 0,
+      "math": 9,
+      "structure": 9,
+      "evidence": "Cleanest prose/order with good LaTeX for BERT subscripts and embeddings; figures/tables from shown pages are mostly omitted rather than structured."
+    },
+    "G": {
+      "text": 9,
+      "tables": 2,
+      "math": 9,
+      "structure": 9,
+      "evidence": "Faithful prose/order and good LaTeX; includes Figure 2 as an HTML table but it is truncated and the visible experimental tables are not present."
+    },
+    "H": {
       "text": 6,
       "tables": 0,
       "math": 4,
-      "structure": 7,
-      "evidence": "Prose is mostly in order but has OCR errors such as 'Dai and Lee', 'Jernite al.', and 'I_i' for T_i; math symbols like R^H are mangled and visible later tables are missing."
+      "structure": 6,
+      "evidence": "Text is readable but cluttered with citation anchors/HTML artifacts, headings are inconsistent, math is degraded like T^i instead of T_i, and tables are absent."
     }
   },
   "ranking": [
+    "G",
+    "F",
+    "E",
     "B",
     "C",
-    "A",
-    "D"
+    "D",
+    "H",
+    "A"
   ],
   "judge": "codex"
 }

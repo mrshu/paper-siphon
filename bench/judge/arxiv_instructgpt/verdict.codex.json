@@ -4,36 +4,68 @@
       "text": 8,
       "tables": 0,
       "math": 4,
-      "structure": 8,
-      "evidence": "Strong prose and order through Related work, but noisy citation links and a garbled footnote marker; visible Tables 1-3 and equations are absent from the shown output."
+      "structure": 7,
+      "evidence": "Prose is mostly faithful through page 5, but has OCR errors like `1owe@openai . com`; visible Tables 1-3 and equations are absent."
     },
     "B": {
-      "text": 8,
-      "tables": 0,
-      "math": 4,
-      "structure": 8,
-      "evidence": "Faithful prose with minor spacing/OCR issues such as 'Agoal' and lost italics; visible tables and displayed equations from later shown pages are absent."
-    },
-    "C": {
       "text": 9,
       "tables": 0,
       "math": 5,
       "structure": 8,
-      "evidence": "Best prose fidelity and preserves bold lead sentences plus inline math like 85\u00b13%, but has one dropped word in 'prefer InstructGPT outputs from GPT-3'; visible tables/equations are absent."
+      "evidence": "Clean prose and hierarchy with good inline math like `85 \\pm 3\\%`, but visible Tables 1-3 and displayed equations from pages 8-9 are not present."
+    },
+    "C": {
+      "text": 6,
+      "tables": 0,
+      "math": 4,
+      "structure": 5,
+      "evidence": "Early prose is good, but raw JSON bounding-box artifacts interrupt page 4 and damage reading order; visible tables/equations are absent."
     },
     "D": {
+      "text": 8,
+      "tables": 0,
+      "math": 4,
+      "structure": 7,
+      "evidence": "Mostly faithful prose with minor OCR/spacing issues like `Agoal` and `InstructGPT .`; tables and displayed equations are missing."
+    },
+    "E": {
+      "text": 9,
+      "tables": 2,
+      "math": 5,
+      "structure": 8,
+      "evidence": "Strong prose and headings, includes Figure 2 as an HTML table-like diagram, but actual Tables 1-3 and displayed equations are not captured in the shown start."
+    },
+    "F": {
       "text": 7,
       "tables": 1,
       "math": 4,
-      "structure": 8,
-      "evidence": "Good order but has OCR/content errors such as 'Tamarin' for Tamkin and '100 fewer parameters'; author block is a table but actual visible Tables 1-3 and equations are absent."
+      "structure": 7,
+      "evidence": "Generally readable but has OCR errors such as `Tamarin` for Tamkin and drops `x` in `100x`; author block is tabled, but real Tables 1-3 and equations are missing."
+    },
+    "G": {
+      "text": 2,
+      "tables": 0,
+      "math": 2,
+      "structure": 2,
+      "evidence": "Output is polluted with `<|LOC|>` tokens, repeated `175B`, hallucinated Step 4-20 text, duplicated paragraphs, and no usable tables."
+    },
+    "H": {
+      "text": 7,
+      "tables": 0,
+      "math": 4,
+      "structure": 6,
+      "evidence": "Prose is mostly present but cluttered with citation anchors and malformed footnote HTML (`<sup>&</sup>lt;sup>3</sup>`); tables/equations absent."
     }
   },
   "ranking": [
-    "C",
     "B",
+    "E",
     "A",
-    "D"
+    "D",
+    "F",
+    "H",
+    "C",
+    "G"
   ],
   "judge": "codex"
 }

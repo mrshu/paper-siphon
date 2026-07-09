@@ -3,36 +3,68 @@
     "A": {
       "text": 9,
       "tables": 0,
-      "math": 10,
-      "structure": 8,
-      "evidence": "Prose and equations 1-7 are faithful, but visible Algorithm 1 table is absent and page header '4 Z. Huang et al.' is misread as a heading."
+      "math": 9,
+      "structure": 9,
+      "evidence": "Faithful prose through p10 with captions and equations 1-7 in usable LaTeX; no p13 Algorithm table captured."
     },
     "B": {
+      "text": 6,
+      "tables": 0,
+      "math": 5,
+      "structure": 5,
+      "evidence": "Large JSON bbox artifacts and page headers interrupt reading; math section is truncated before equations and p13 table is absent."
+    },
+    "C": {
+      "text": 8,
+      "tables": 0,
+      "math": 4,
+      "structure": 7,
+      "evidence": "Prose mostly present but headers leak into text and hyphenation/spacing errors occur; equations are plain flattened text and p13 table absent."
+    },
+    "D": {
+      "text": 3,
+      "tables": 0,
+      "math": 3,
+      "structure": 2,
+      "evidence": "LOC tokens pollute nearly every line, abstract/introduction duplicated, figure text becomes garbled, and no p13 table."
+    },
+    "E": {
+      "text": 9,
+      "tables": 0,
+      "math": 8,
+      "structure": 8,
+      "evidence": "Strong prose and figure/caption order with usable LaTeX equations 1-5, but page headers are kept and visible eqs. 6-7/p13 table are missing in shown output."
+    },
+    "F": {
+      "text": 8,
+      "tables": 0,
+      "math": 9,
+      "structure": 8,
+      "evidence": "Good continuous prose and equations 1-7 with tags, but images are mostly only captions, page header becomes a heading, and p13 table absent."
+    },
+    "G": {
+      "text": 6,
+      "tables": 0,
+      "math": 0,
+      "structure": 5,
+      "evidence": "Text is mostly present but figure labels/axis OCR are interleaved into prose and all displayed equations are formula-not-decoded; p13 table absent."
+    },
+    "H": {
       "text": 8,
       "tables": 0,
       "math": 8,
       "structure": 8,
-      "evidence": "Mostly complete prose, but degree symbols become GLYPH, equations lose numbering, and visible Algorithm 1 table is absent."
-    },
-    "C": {
-      "text": 9,
-      "tables": 0,
-      "math": 9,
-      "structure": 8,
-      "evidence": "Strong prose and inline math, with minor heading inconsistency and missing equation numbers for 1-2; visible Algorithm 1 table is absent."
-    },
-    "D": {
-      "text": 5,
-      "tables": 0,
-      "math": 1,
-      "structure": 4,
-      "evidence": "Figure text and chart ticks are merged into prose, '3-4 frames' becomes '34', equations are formula-not-decoded, and visible Algorithm 1 table is absent."
+      "evidence": "Mostly faithful prose and usable LaTeX equations, though degree symbols become GLYPH and some spacing/header issues remain; p13 table absent."
     }
   },
   "ranking": [
     "A",
+    "F",
+    "H",
+    "E",
     "C",
     "B",
+    "G",
     "D"
   ],
   "judge": "codex"

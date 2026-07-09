@@ -1,6 +1,10 @@
 {
-  "A": "granite_docling_mlx",
-  "B": "glm_ocr_mlx",
-  "C": "marker",
-  "D": "docling_standard"
+  "A": "lightonocr2",
+  "B": "marker",
+  "C": "docling_standard",
+  "D": "glm_ocr_mlx",
+  "E": "paddleocr_vl_16",
+  "F": "dots_ocr",
+  "G": "paddleocr_vl_mlx",
+  "H": "granite_docling_mlx"
 }

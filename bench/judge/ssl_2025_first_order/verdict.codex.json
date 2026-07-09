@@ -2,38 +2,70 @@
   "scores": {
     "A": {
       "text": 8,
-      "tables": 5,
-      "math": 8,
-      "structure": 7,
-      "evidence": "Good prose coverage through shown pages, but Table 1 and Table 2 first rows merge label/value, Table 3 has extra empty columns, and page header '6 M. Liang et al.' is inserted as a heading."
+      "tables": 8,
+      "math": 2,
+      "structure": 8,
+      "evidence": "Good prose and Tables 1-3 mostly preserved, but equation is replaced by formula-not-decoded and figure/OCR labels are noisy."
     },
     "B": {
-      "text": 7,
-      "tables": 7,
-      "math": 5,
-      "structure": 7,
-      "evidence": "Most prose is present, but image OCR noise like 'Other' appears around Fig. 4, bullets are malformed, Table 2 first row is split incorrectly, and the solenoid equation has wrong denominator/exponent terms."
+      "text": 0,
+      "tables": 0,
+      "math": 0,
+      "structure": 0,
+      "evidence": "Output is dominated by LOC tags and massive repeated hallucinated Introduction text; tables and math from shown pages are absent."
     },
     "C": {
       "text": 7,
-      "tables": 8,
-      "math": 2,
+      "tables": 9,
+      "math": 6,
       "structure": 6,
-      "evidence": "Tables 1-3 are mostly structurally correct and Table 2 is fixed, but the main equation is replaced by '<!-- formula-not-decoded -->' and figure-label OCR is interleaved into the text/order."
+      "evidence": "Tables 1-3 are strong and equation is usable, but 2.2 Wheelbase and 2.3.1 design paragraphs are missing or skipped."
     },
     "D": {
-      "text": 9,
+      "text": 8,
       "tables": 7,
       "math": 7,
       "structure": 8,
-      "evidence": "Clean prose and good Table 1/Table 3 extraction, but Table 2 is omitted entirely and the solenoid equation loses the l term in the denominator; figure captions around Fig. 3/6 are also missing."
+      "evidence": "Prose and order are strong with usable equation and Tables 1/3, but Table 2 is omitted and some figure captions/content are missing."
+    },
+    "E": {
+      "text": 8,
+      "tables": 6,
+      "math": 7,
+      "structure": 7,
+      "evidence": "Most prose is faithful and equation is captured, but Tables 1/2 merge cells incorrectly and Table 3 has extra blank columns plus page header inserted as heading."
+    },
+    "F": {
+      "text": 9,
+      "tables": 9,
+      "math": 8,
+      "structure": 8,
+      "evidence": "Very faithful prose, hierarchy, and Tables 1-3; minor page headers are included and equation denominator appears slightly wrong versus the image."
+    },
+    "G": {
+      "text": 7,
+      "tables": 7,
+      "math": 3,
+      "structure": 7,
+      "evidence": "Prose mostly intact but has OCR noise like 'Other' around Fig. 4, Table 2 merged first row, and the solenoid equation is badly corrupted."
+    },
+    "H": {
+      "text": 6,
+      "tables": 2,
+      "math": 0,
+      "structure": 5,
+      "evidence": "Readable prose in order, but tables are flattened lists without structure and the solenoid equation is unusable OCR gibberish."
     }
   },
   "ranking": [
+    "F",
     "D",
-    "B",
     "A",
-    "C"
+    "E",
+    "C",
+    "G",
+    "H",
+    "B"
   ],
   "judge": "codex"
 }

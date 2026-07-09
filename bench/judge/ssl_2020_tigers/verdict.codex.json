@@ -5,35 +5,67 @@
       "tables": 2,
       "math": 1,
       "structure": 4,
-      "evidence": "Most prose is unreadable dingbat/a-code glyph garbage; Table 1 row/column shape is present but cell text is also garbled; captions/headings roughly ordered."
+      "evidence": "Most prose is unreadable glyph/codepoint garbage like /a116; Table 1 has row/column shape but cell text is gibberish, while order roughly follows pages."
     },
     "B": {
       "text": 6,
       "tables": 0,
-      "math": 7,
+      "math": 6,
       "structure": 5,
-      "evidence": "Readable prose but drops the page-2 introduction paragraphs and Table 1 entirely, jumps from Fig. 1 to Fig. 2/section 2, and has OCR artifacts like GLYPH/turing."
+      "evidence": "Readable prose where present, but skips intro body and Table 1 entirely, jumps from Fig. 1 to Fig. 2/section 2, and has OCR artifacts like turingGLYPH."
     },
     "C": {
       "text": 9,
-      "tables": 9,
+      "tables": 8,
       "math": 9,
       "structure": 9,
-      "evidence": "Faithfully captures visible prose, headings, captions, footnotes, symbols, and Table 1 with only minor OCR/spelling issues and truncation at the start of Fig. 7."
+      "evidence": "Very faithful prose and order with usable headings, captions, footnotes, degree/superscript notation; Table 1 is a clean Markdown table though merged rows are represented with blank v2020 cells."
     },
     "D": {
       "text": 8,
+      "tables": 4,
+      "math": 6,
+      "structure": 7,
+      "evidence": "Mostly accurate text/order, but Table 1 is flattened line-by-line instead of tabular, and symbols degrade in places such as 45' and 155'C."
+    },
+    "E": {
+      "text": 8,
       "tables": 8,
-      "math": 9,
+      "math": 8,
       "structure": 8,
-      "evidence": "Good reading order and table, but ligatures are lost in many words such as fth/gure/xes/specications/dierent and the shown output truncates during the page-9 dribbler text."
+      "evidence": "Good order and Markdown table, but recurring ligature/OCR losses such as fth/gure/specications/dierent and minor table/header artifacts reduce fidelity."
+    },
+    "F": {
+      "text": 1,
+      "tables": 1,
+      "math": 1,
+      "structure": 1,
+      "evidence": "After the title it hallucinates many repeated AI-driven robot lines and produces a massively mangled table separator, making content largely unusable."
+    },
+    "G": {
+      "text": 9,
+      "tables": 9,
+      "math": 8,
+      "structure": 9,
+      "evidence": "Faithful prose, captions, image placeholders, hierarchy, and structurally correct HTML Table 1; only small OCR/name/math issues like Sabole Jut and $30A^3$."
+    },
+    "H": {
+      "text": 6,
+      "tables": 8,
+      "math": 7,
+      "structure": 5,
+      "evidence": "Early text and HTML table are good, but raw layout JSON/bboxes are inserted mid-document and the Kicker section heading/intro before Fig. 6 are missing."
     }
   },
   "ranking": [
+    "G",
     "C",
+    "E",
     "D",
+    "H",
     "B",
-    "A"
+    "A",
+    "F"
   ],
   "judge": "codex"
 }

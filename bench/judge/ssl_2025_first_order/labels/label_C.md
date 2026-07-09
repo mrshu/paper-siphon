@@ -1,0 +1,127 @@
+# First Order Robotics Team Description Paper
+## Small Size League of RoboCup 2025
+
+Martin Liang, Joel Ng, Fred Huang, Louis Yong, Pi Rong Koh, Hamish Starling,
+and Luke Moran
+
+Imperial College London, Exhibition Rd, South Kensington, London, UK
+firstorderrobotics@gmail.com
+
+**Abstract.** This paper describes the efforts and improvements made by the First Order Robotics Team to compete in the 2025 RoboCup Small Size League Division B. It describes the major hardware improvements from the previous year's design, along with a newly developed codebase for the control and co-ordination of the robots.
+
+# 1 Introduction
+
+The First Order Robotics Team is a newly formed student-run group from Imperial College London under the umbrella of the Imperial College Robotics Society (ICRS). Initially formed under ICRS FC in 2023, the team was unsuccessful in qualifying, as it struggled with lacklustre student engagement, along with a plethora of mechanical, hardware and software roadblocks. This year, the team has seen a significant reconsolidation of its members' effort to design a credible hardware system and codebase by studying ETDPs and TDPs from successful teams, and learning from the team's past mistakes in 2024. This year, the team has also enjoyed a revitalized software development team that has made substantial progress in the robotic control and co-ordination algorithm design, as detailed in Section 5. This paper is divided into four major categories: mechanical systems, hardware, embedded systems and software.
+
+# 2 Mechanical Systems
+
+## 2.1 Objectives
+
+Last year was our first attempt at designing and building robots that fit the RoboCup SSL competition criteria. The previous generation used a three-wheel omnidirectional layout with a simple fixed-frame dribbler design. The kicker employed a spring-loaded mechanism.
+
+Looking back, many of these design decisions were not ideal. For example, the three-wheel layout significantly restricted the dribbler module's open-for-catch size when receiving the ball. Another issue was that the chosen motor had a relatively long body extending toward the wheelbase center, severely limiting the available space for the solenoid, restricting shooting performance, and leaving no room for future upgrades. Only two units were produced last year. The design from last year can be seen in Figure 1 (1) and (2).
+
+This year, our goal is to redesign from first principles, correct past mistakes, make well-informed engineering decisions for mass production, and ensure expandability for future iterations in the coming years. As a new team, we aim to achieve top-tier mechanical performance in Division B and ultimately reach a level where we are competitive with Division A teams.
+
+The final design of the robot for SSL this year is shown in figure 1 (3)-(6), with details discussed below.
+
+Fig. 1. Robot design comparison between SSL 24 to 25
+
+**Fig. 2.** Exploded view of the wheel actuator assembly
+
+We used the DM3519, a brushless motor with built-in precision FOC control and CAN communication. It delivers high power output, is compact, and remains cost-effective at just £40 per motor. This outperforms other motors in the same price range. The specifications of this motor is listed in Table 1.
+
+**Table 1.** DM3519 Motor Specifications
+
+<table><thead><tr><th colspan="2">DM3519 Motor Parameters</th></tr></thead><tbody><tr><td>Rated Voltage</td><td>24V (Drive supports 15-52V supply)</td></tr><tr><td>Rated Phase Current (Power Supply Current)</td><td>9.2A (8.6A)</td></tr><tr><td>Peak Phase Current (Bus Current)</td><td>20.5A (16.1A)</td></tr><tr><td>Rated Torque</td><td>3.5Nm</td></tr><tr><td>Peak Torque</td><td>7.8Nm</td></tr><tr><td>Rated Speed</td><td>395rpm</td></tr><tr><td>No-load Maximum Speed</td><td>435rpm</td></tr></tbody></table>
+
+With this crucial component finalized, the design space for other modules was established. The whole robot assembly breakdown is shown in Figure 3, with important specifications listed in Table 2.
+
+Fig. 3. Explode view of the wheel actuator assembly
+
+**Table 2.** Essential Physical Specifications
+
+<table><thead><tr><th>Specification</th><th>Value</th></tr></thead><tbody><tr><td>Ball Exposure Area Percentage</td><td>82%</td></tr><tr><td>Robot Dimension (D x H)</td><td>D: 178mm, H: 149mm</td></tr><tr><td>Wheel Diameter</td><td>53.6mm</td></tr><tr><td>Power Supply</td><td>6s BAK Li-ion 18650 22.2V 2500mAh</td></tr><tr><td>Approx Weight</td><td>2.1kg</td></tr></tbody></table>
+
+## 2.3 Dribbler System
+
+The dribbler is the most complex mechanical unit in an SSL robot. Based on insights from previous TDPs of other teams, a well-designed dribbler should have the following key features.
+
+- High RPM: Ensures the ball remains in contact with the rod both at rest and during motion.
+- Shock Absorption: Effectively dampens impact when the ball enters the dribbler at high speed.
+- Self-Centering Capability: Improves precision shooting and enables the robot to execute sharper turns with higher angular velocity.
+
+Due to budget limitations, we were unable to source for a dribbler motor with similar specifications (>35W, 20K+ RPM) as described in other papers [11]. To minimize design limitations, we selected a 12W BLDC motor with a built-in Hall sensor and a speed of over 12K RPM, originally designed for surgical applications (e.g., plaster removal). The actual performance of this motor is still under evaluation, but based on initial observations, it performs satisfactorily.
+
+Recognizing that the motor speed of the dribbler is crucial for ball control, we designed a ball feed-in status feedback mechanism to enable closed-loop control.
+
+**Fig. 4.** Visual illustration of the dynamic interaction between ball and spring damper
+
+Furthermore, the robot's forward/backward speed and angular velocity can be used as feed-forward inputs in the control loop. This helps regulate the dribbler speed, maintaining an upright ball position with three stable contact points — the carpet, chip shovel, and rod — for stable ball control.
+
+Lastly, for self-centring, we are using a lathed aluminium rod as the core, with silicone-moulded outer features. This allows for quick iterations and geometry testing. Several design iterations have been implemented, proving that a variable pitch spiral design is effective. In some cases, the ball oscillates back and forth on the rod, which we suspect is due to improper damping and spring tuning. Further refinements will be made to optimize stability.
+
+## 2.4 Kicker Actuation
+
+The kicker of the robot, although designed and manufactured, has not been thoroughly tested due to the unfinished control board. The primary goal is to maximize the kicking speed.
+
+From a research paper from Eastern Washington University [14], we know that the force generated by a solenoid is proportional to certain key parameters, as shown in the equation below. A simple conclusion can be drawn: winding factor and internal resistance are crucial in solenoid coil design. A solenoid with thin wire and a high turn count is less desirable than one with thicker wire and fewer turns if the resistance is too high.
+
+$$F = \frac{-V^2 \mu_r \mu_0}{8\pi (l_a^2)^2 l^2} \left( \frac{r_0}{\frac{a}{2\lambda l} N + r_0} \right)^2 \alpha e^{-\frac{\alpha}{l} x} \quad (1)$$
+
+Where $ρ$ is the resistivity of the material, $r_0$ is the cross-sectional area of the wire, $μ_0$ and $μ_r$ are permittivity, $V$ is the applied voltage, $N$ is the number of windings, $r_0$ is the internal radius of the coil.
+
+Additionally, the plunger material must have high magnetic permeability and high saturation flux density to ensure optimal performance. According to previous studies, 1020 steel is a suitable material for this application. However, after further research, we found that DT4 is also a viable alternative. DT4 is also readily available, easy to manufacture, and cost-effective. A comparison between DT4 and 1020 steel is provided in Table 3.
+
+<table><thead><tr><th>Property</th><th>1020 Steel</th><th>DT4 (Soft Magnetic Alloy)</th></tr></thead><tbody><tr><td>Composition</td><td>Low-carbon steel (0.18-0.23% C)</td><td>High-purity iron</td></tr><tr><td>Magnetic Permeability</td><td>Moderate</td><td>High</td></tr><tr><td>Saturation Flux Density</td><td>≈ 2.1 T</td><td>≈ 2.0 T</td></tr><tr><td>Coercivity</td><td>Higher</td><td>Lower</td></tr><tr><td>Electrical Resistivity</td><td>10<sup>-7</sup> Ω·m</td><td>Slightly higher than 1020 steel</td></tr><tr><td>Machinability</td><td>Good</td><td>Moderate</td></tr><tr><td>Corrosion Resistance</td><td>Low</td><td>Low</td></tr><tr><td>Cost</td><td>Lower</td><td>Higher</td></tr></tbody></table>
+
+**Table 3.** Comparison of 1020 Steel and DT4 Material for Solenoid Plungers
+
+In order to produce the coil with good winding factor in-house, a winding machine was made to facilitate this process, as shown in Figure 5. Additionally, for simpler routing & assembly, the solenoid coil ends are connected to an XT30 ports installed on a PCB. The full model of the kicker is shown in Figure 6, with the upper coil for parallel kicking and lower one for chip kicking. The chip kicking uses a percussion mechanism described in a ZJUNLICT TDP [5]. A preliminary test was done using a boost converter that charges a capacitor array to 90V. This was discharged immediately through a mechanical switch. From the accompanying video submission, the ball can be seen to eject at roughly 3m/s. Please note that in our qualification video, the high-power kicker board responsible for controlling the charging and discharging of the kicking actuation is still under development. As a result, we have used the robot to collide with the ball and push it toward the goal instead. The video of the capacitor array discharge is attached at the end, which should perform effectively the same for our final version [12]. More supplementary media materials will be posted in the future under the same channel.
+
+**Fig. 5.** Coil winding Machine in use
+
+Fig. 6. Kicker system assembly
+
+# 3 Hardware
+
+The robot's operation is managed by three primary boards: the main control board, the kicker board, and a Raspberry Pi. The main control board communicates with the central computer via the onboard NRF24 module, controls five BLDC motors (four for movement and one for dribbling), and processes inputs from various sensors, including infrared sensors, encoders, and a compass. The kicker board is responsible for distributing power across the robot's voltage rails (24V, 5V, and 3.3V) and supplying power to the two kicking solenoids. Finally, the Raspberry Pi is dedicated to handling the camera, which provides additional data to enhance the robot's decision-making capabilities.
+
+## 3.1 Main Control Board
+
+In this year's iteration, a robotics specific STM32H723VGT6 development board is used for the following reasons:
+
+- The DM-MC02 - STM32H723VGT6 development board can be procured at a decent price with very compact physical dimensions.
+- The board comes with most of the peripherals needed, such as USART, SPI, CAN ports, saving manpower and costs related to prototyping.
+
+However, a key limitation of this approach is the insufficient number of GPIO pins to meet the robot's requirements. To address this constraint, an additional extension board was designed and stacked above the main board, utilizing the extension BTB port for expanded functionality. Future development will focus on developing a new hardware unit with same MCU that server as a role of a master transmitter, which communicates between the main decision-making PC and all 6 robots in the field. This board will have features such as a screen and buttons for debugging and status input, and multiple NRF24 and antennas installed.
+
+## 3.2 Kicker Board
+
+In the previous year, challenges arose in the design of the robot's kicker due to the use of relays for discharging the capacitor bank. Over time, the relay contacts experienced wear and tear, leading to reliability issues. In the current iteration, power MOSFETs have been implemented as a more reliable alternative, ensuring faster and more consistent discharge performance.
+
+### 3.2.1 Capacitor Array
+The kicker is powered by a capacitor bank consisting of 12 265uF 330V electrolytic capacitors connected in parallel. This configuration provides a theoretical maximum energy of 173J. However, the capacitors are only charged up to 120V, as this voltage is sufficient to propel the ball at the speed limit of 6.5m/s.
+
+### 3.2.2 Charging Architecture
+The capacitor bank is charged using the LT3751 high voltage capacitor charger. This chip enables rapid charging, allowing the capacitor bank to fully charge in under 2 seconds, ensuring minimal downtime between kicks. This is a huge improvement from last year's charging time, allowing for higher frequency of passes and an improved strategy.
+
+Fig. 7. Kicker 2025 Version
+
+Fig. 8. Capacitor Board
+
+**3.2.3 Safety and Isolation** Given the high voltages involved, the kicker board is designed with safety in mind to protect the user:
+
+- Galvanic Isolation: The board is divided into low and high-voltage sections, which are galvanically isolated to protect the MCUs. Transformers handle power delivery, while optocouplers transmit digital signals. This isolation has proven effective in safeguarding the low power control system, especially during high-power testing.
+- Automatic Discharge: To prevent accidental shocks, the capacitor bank automatically discharges through a power resistor when the battery is disconnected.
+
+One limitation of the current design is that the kicker's strength cannot be easily adjusted due to galvanic isolation. Future iterations will incorporate a variable voltage charging mechanism, allowing for adjustable kick strength and greater strategic flexibility in gameplay.
+
+**3.3 Wireless Communication**
+
+Last year, we selected the NRF24L01 as the RF solution for communication between the controller PC and each bot. A PCB was designed with this chip and its peripherals, with signals output through an on-board PCB antenna. This setup has proven effective, and we continue to use this model this year. Two improvements have been proposed.
+
+- To enhance transmission stability and ensure a secure connection, each NRF24 module is now decoupled from the main control PCB and installed in a dedicated area, making it easier to replace if damaged. Additionally, each module is equipped with a power amplifier, low-noise amplifier, and an SMA antenna connected via an IPEX coaxial cable.
+- Each robot is now equipped with two NRF24 modules, with one dedicated solely to receiving (Rx) and the other to transmitting (Tx). This allows for greater communication bandwidth. Although considerable redundancy is reserved for current software development, this setup ensures sufficient data transfer bandwidth in the future.
+
+[{"bbox": [540, 126, 931, 151], "category": "Page-header", "text": "First Order Robotics Team Description Paper"}, {"bbox": [231, 179, 429, 205], "category": "Section-header", "text": "## 3.4 Raspberry Pi"}, {"bbox": [231, 222, 999, 348], "category": "Text", "text": "Each bot is equipped with a Raspberry Pi 4 that serves as a reserve on-board computing platform with wireless connectivity. While software development is still in progress, it will eventually support high-computing tasks, such as edge ML and vision processing, that the STM32H7 cannot handle. The following functions are proposed for development."}, {"bbox": [243, 363, 999, 840], "category": "List-item", "text": "- Robot Status Broadcasting: The Raspberry Pi connects the H7 and Kicker (high power) board via the UART protocol, receiving utility data such as real-time power consumption, computational resource usage, and system logs. This information can be broadcasted over the on-board Wi-Fi to a central server for remote monitoring.\n- On-device MCU Firmware Downloader/Debugger: Our current toolchain involves using STM32CubeMX to generate the necessary driver code for the H7 board, followed by compiling the code into firmware using makefile, and then flashing it onto the MCU via ST-Link. This process can be tedious, especially when tuning the robots in motion. With a Raspberry Pi on the bot, we can use it as a Linux platform to modify, compile, and wirelessly connect to the MCU for flashing, offering significant convenience.\n- Vision Processing: An HD 30 FPS USB camera, mounted on top of the dribbler, serves as the only on-device perception sensor for each bot (apart from the IR gate sensor). Compared to the top global camera, this provides lower latency and eliminates reliance on the master PC for tasks like ball detection [13], auto-aiming/catching, self-ball centering, and in the future for collision avoidance, and FPV recording for AI training. These features require an on-board device such as a Raspberry Pi."}, {"bbox": [231, 879, 515, 908], "category": "Section-header", "text": "# 4 Embedded Systems"}, {"bbox": [231, 932, 399, 957], "category": "Section-header", "text": "## 4.1 Movement"}, {"bbox": [231, 974, 1008, 1175], "category": "Text", "text": "Unlike traditional wheeled robots which can only perform translational and non-stationary rotational movement, our robot has 4 omnidirectional wheels located roughly equidistant around the circumference of the robot. This enables simultaneous translational and rotational movement. Prior research on the simultaneous translation and rotation of omniwheeled robots has been done by decomposing the overall movement into individual velocity components for each wheel, parallel to the direction of the wheels [9]. However, an additional velocity component must also be added to each wheel, proportional to the radius of the robot."}, {"bbox": [231, 1212, 463, 1236], "category": "Section-header", "text": "## 4.2 Communications"}, {"bbox": [231, 1253, 999, 1380], "category": "Text", "text": "As mentioned previously in the hardware section, we used the NRF24 mod

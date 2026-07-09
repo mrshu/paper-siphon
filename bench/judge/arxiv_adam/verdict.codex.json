@@ -1,39 +1,71 @@
 {
   "scores": {
     "A": {
-      "text": 7,
-      "tables": 6,
-      "math": 3,
-      "structure": 6,
-      "evidence": "Main prose is mostly present, but second author is misplaced after the footnote/intro, algorithm math has OCR tokens like /epsilon1 and /circledot, and many displayed equations are replaced by formula-not-decoded."
+      "text": 9,
+      "tables": 9,
+      "math": 9,
+      "structure": 8,
+      "evidence": "Faithful prose and Algorithm 1 with usable LaTeX; minor issues include repeated page headers/arXiv marginal text and section 3 downgraded/misnumbered as a top heading."
     },
     "B": {
-      "text": 9,
-      "tables": 8,
-      "math": 8,
-      "structure": 8,
-      "evidence": "Prose and reading order are strong and Algorithm 1 is mostly usable, but some math is wrong such as sqrt(v_t) instead of sqrt(hat v_t), eq. 4 drops beta_2^t, and Theorem 4.1 uses alpha/sqrt(T)."
+      "text": 3,
+      "tables": 3,
+      "math": 3,
+      "structure": 2,
+      "evidence": "Severe LOC tokens, duplicated paragraphs, repeated Algorithm/section text, and wrong formulas such as beta powers and gradients make reading order and math largely broken."
     },
     "C": {
       "text": 6,
-      "tables": 3,
-      "math": 5,
+      "tables": 5,
+      "math": 3,
       "structure": 6,
-      "evidence": "Early prose is usable, but Algorithm 1 is truncated/mangled after m_0, section 2.1 loses much of the paragraph before section 3, and Theorem 4.1 formula is badly corrupted."
+      "evidence": "Prose mostly present but author order is displaced, Algorithm 1 is a single dense code block, and many equations are replaced by formula-not-decoded markers."
     },
     "D": {
+      "text": 6,
+      "tables": 3,
+      "math": 5,
+      "structure": 5,
+      "evidence": "Main prose is readable, but Algorithm 1 is truncated after m0 and theorem math is badly garbled; later section text is partially dropped."
+    },
+    "E": {
+      "text": 8,
+      "tables": 8,
+      "math": 7,
+      "structure": 7,
+      "evidence": "Good prose and algorithm structure, but several formulas are wrong, e.g. beta2 correction becomes 1-beta2, alpha_t uses sqrt(T), and headings are inconsistently marked."
+    },
+    "F": {
+      "text": 3,
+      "tables": 4,
+      "math": 1,
+      "structure": 3,
+      "evidence": "Early prose is readable, but page 3 collapses into massive tilde garbage and many later equations/theorem expressions are OCR gibberish."
+    },
+    "G": {
       "text": 9,
       "tables": 8,
       "math": 9,
-      "structure": 9,
-      "evidence": "Best overall: prose, algorithms, equations, and section order are mostly faithful, with minor issues like a literal \\nend while in Algorithm 1 and a small symbol error in the cancellation equation."
+      "structure": 8,
+      "evidence": "Very faithful prose, algorithms, and displayed equations; minor issues include a literal \\n in Algorithm 1, odd heading levels, and one rescaling formula typo."
+    },
+    "H": {
+      "text": 8,
+      "tables": 8,
+      "math": 8,
+      "structure": 8,
+      "evidence": "Strong overall transcription, but starts with wrong arXiv version, has an incorrect alpha_t formula, hyphenation artifacts, and duplicated stray equations near Related Work."
     }
   },
   "ranking": [
-    "D",
-    "B",
     "A",
-    "C"
+    "G",
+    "H",
+    "E",
+    "C",
+    "D",
+    "F",
+    "B"
   ],
   "judge": "codex"
 }

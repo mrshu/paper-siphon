@@ -1,34 +1,54 @@
 {
-  "judge": "claude",
   "scores": {
     "A": {
-      "text": 9,
-      "tables": 3,
-      "math": 9,
-      "structure": 9,
-      "evidence": "Faithful prose with clean markdown heading hierarchy and cross-ref anchors; display summation renders as correct LaTeX. But all 3 tables are structurally mangled: label column merged with Mean ('Angular Velocity (deg/s) 62.0006' in one cell) and p10/p75/p95/max collapsed into a single cell."
+      "text": {"score": 8, "evidence": "Full prose faithful and complete through references (truncated at ref 8); page-header lines interspersed but text intact."},
+      "tables": {"score": 4, "evidence": "All tables destroyed into vertical single-cell lists (each value on its own line); values preserved but structure lost, plus duplicated Table 3 caption."},
+      "math": {"score": 2, "evidence": "Cost function reduced to bare text 'sum all test scenarios'; the weighted w1..w6 theta terms are dropped."},
+      "structure": {"score": 5, "evidence": "Linearized, headings unmarked (plain numbers), repeated running-header noise; reading order otherwise fine."}
     },
     "B": {
-      "text": 9,
-      "tables": 5,
-      "math": 9,
-      "structure": 7,
-      "evidence": "Accurate prose, clean LaTeX for both the summation and inline $\\approx 200V$; Tables 2 and 3 are perfect markdown. However Table 1 (Position/Speed/Orientation/Angular Velocity) is dropped entirely, and section headings are plain text rather than markdown headers."
+      "text": {"score": 8, "evidence": "Faithful clean prose; minor OCR slips ('roboup', 'diag a fault' for flag) and one dropped clause ('achieve this, but we should be able to')."},
+      "tables": {"score": 7, "evidence": "All three as markdown tables with correct values; Table 1 Angular Velocity row merged into header column (misaligned)."},
+      "math": {"score": 9, "evidence": "Cost-function summation rendered as valid LaTeX with all theta/theta-dot terms."},
+      "structure": {"score": 9, "evidence": "Proper markdown headings, image placeholders, correct section order."}
     },
     "C": {
-      "text": 5,
-      "tables": 9,
-      "math": 2,
-      "structure": 5,
-      "evidence": "All 3 tables present and structurally correct, but oscilloscope readout ('H1 / 10.0V / M Pos: 2.880s') and scattered plot-axis labels are hallucinated into the body text, disrupting reading order; the summation equation is lost as '<!-- formula-not-decoded -->'."
+      "text": {"score": 9, "evidence": "Complete faithful prose incl. title, authors, subplot captions; output truncates at Table 3 caption."},
+      "tables": {"score": 9, "evidence": "All three tables as clean HTML with fully correct values."},
+      "math": {"score": 9, "evidence": "Cost function in correct LaTeX with all terms and subscripts."},
+      "structure": {"score": 9, "evidence": "Proper heading hierarchy, image refs, correct reading order throughout."}
     },
     "D": {
-      "text": 6,
-      "tables": 6,
-      "math": 5,
-      "structure": 8,
-      "evidence": "Clean headings and reading order with no figure garbage; Tables 2 and 3 correct but Table 1's Angular Velocity row is shifted/merged. Text has errors: 'roboup@gmail.com', 'possibly diag a fault', and a dropped clause ('to achieve this, but we should be able'); summation LaTeX present but subscript garbled to 'est scenarions'."
+      "text": {"score": 5, "evidence": "Drops title/authors and the entire 2 Electrical / 2.1 Overview / 2.2 Chicker Board / Power Input Protections prose (jumps Intro -> Fig 2.1); 'chicken board' typo."},
+      "tables": {"score": 8, "evidence": "Tables rendered as correct HTML with right values."},
+      "math": {"score": 8, "evidence": "Formula present as valid LaTeX (embedded in a JSON dump but correct)."},
+      "structure": {"score": 3, "evidence": "Raw JSON layout dumps (bbox/category/text) pasted inline in three places; missing sections break reading order."}
+    },
+    "E": {
+      "text": {"score": 9, "evidence": "Complete, faithful prose including full references 1-9."},
+      "tables": {"score": 6, "evidence": "Tables 2 and 3 as clean correct markdown, but Table 1 (the 4-row Position/Speed/Orientation/Angular Velocity table) is dropped entirely."},
+      "math": {"score": 9, "evidence": "Cost function in correct LaTeX with all terms."},
+      "structure": {"score": 7, "evidence": "Good reading order, but headings unmarked (plain '2 Electrical' etc.), only sub-headers bolded."}
+    },
+    "F": {
+      "text": {"score": 2, "evidence": "Pervasive <|LOC_..|> tokens, duplicated Introduction paragraph, loop 'There has been a long time to fix this problem' x4 replacing Flyback content, garbled 'system to be�ed'."},
+      "tables": {"score": 1, "evidence": "No real tables; hundreds of lines of hallucinated repeating x/y-coordinate fake data instead."},
+      "math": {"score": 2, "evidence": "Cost function absent; only a stray $\\approx$ survives."},
+      "structure": {"score": 1, "evidence": "Broken by LOC tokens, duplications, loops and hallucinated data floods; unusable."}
+    },
+    "G": {
+      "text": {"score": 8, "evidence": "Faithful prose but figure OCR fragments (axis ticks, 'H1 / 10.0V / M Pos', plot labels) scattered between sections."},
+      "tables": {"score": 9, "evidence": "All three tables as correct markdown with right values (best table fidelity)."},
+      "math": {"score": 2, "evidence": "Cost function emitted as '<!-- formula-not-decoded -->'; math dropped."},
+      "structure": {"score": 6, "evidence": "Clean markdown headings but interrupted repeatedly by dumped chart-axis text fragments."}
+    },
+    "H": {
+      "text": {"score": 9, "evidence": "Faithful, complete prose with useful cross-reference anchors; truncates in Conclusion."},
+      "tables": {"score": 5, "evidence": "All three tables malformed: 'Mean Median' merged into one column and Angular Velocity rows shifted/misaligned though values present."},
+      "math": {"score": 9, "evidence": "Cost function in correct LaTeX with all terms."},
+      "structure": {"score": 9, "evidence": "Clean heading hierarchy with anchor links; correct reading order."}
     }
   },
-  "ranking": ["A", "B", "D", "C"]
+  "ranking": ["C", "B", "H", "E", "G", "A", "D", "F"],
+  "judge": "claude"
 }

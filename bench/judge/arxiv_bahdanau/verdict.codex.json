@@ -5,35 +5,67 @@
       "tables": 0,
       "math": 8,
       "structure": 8,
-      "evidence": "Good prose coverage through section 4.2, but author affiliation accents and some words are garbled; Table 1 is missing; equations mostly usable with some subscript/superscript errors."
+      "evidence": "Mostly faithful prose and order, but author affiliation accents/citations are noisy, some math indices are garbled such as y_t^0, and Table 1 is absent."
     },
     "B": {
       "text": 9,
       "tables": 0,
-      "math": 8,
-      "structure": 9,
-      "evidence": "Clean prose and reading order through results; Table 1 is missing; equations are usable, though BiRNN arrows/backward notation are wrong and equation numbers are detached."
+      "math": 9,
+      "structure": 8,
+      "evidence": "Clean prose and LaTeX equations with good hierarchy, but repeated page headers/sidebar text intrude and Table 1 is absent."
     },
     "C": {
-      "text": 7,
+      "text": 8,
       "tables": 0,
-      "math": 6,
-      "structure": 7,
-      "evidence": "Mostly complete prose but with OCR errors like Kalchbrneren and Universit'e; Table 1 is missing; math is readable but cluttered with escaped underscores and lost equation numbers."
+      "math": 7,
+      "structure": 8,
+      "evidence": "Prose is mostly present but has OCR errors like Kalchbrneren/\u00c8neco and awkward math tokenization; Table 1 is missing despite reaching results."
     },
     "D": {
+      "text": 7,
+      "tables": 0,
+      "math": 8,
+      "structure": 5,
+      "evidence": "Good equations and prose early, but it drops the end of page 1 introduction, injects raw bbox JSON, and omits Table 1."
+    },
+    "E": {
+      "text": 6,
+      "tables": 0,
+      "math": 3,
+      "structure": 6,
+      "evidence": "Prose mostly follows the paper but equations are badly damaged or missing, e.g. p(y) and c_i formulas, and Table 1 is absent."
+    },
+    "F": {
+      "text": 2,
+      "tables": 0,
+      "math": 2,
+      "structure": 2,
+      "evidence": "Contains location tokens, duplicated passages, hallucinated/reworded prose, repeated lines, missing equations, and no table."
+    },
+    "G": {
+      "text": 8,
+      "tables": 0,
+      "math": 7,
+      "structure": 7,
+      "evidence": "Readable and mostly complete prose through shown pages, but some indices/directional arrows are wrong and Table 1 is missing."
+    },
+    "H": {
       "text": 5,
       "tables": 0,
       "math": 1,
-      "structure": 5,
-      "evidence": "Prose is partly intact but author lines and symbols are mangled, formulas are replaced by formula-not-decoded, and Figure 3 alignment image becomes OCR junk; Table 1 is missing."
+      "structure": 4,
+      "evidence": "Many formulas are replaced by formula-not-decoded or glyph garbage, alignment figure OCR text pollutes the end, and Table 1 is absent."
     }
   },
   "ranking": [
     "B",
     "A",
+    "G",
     "C",
-    "D"
+    "D",
+    "E",
+    "H",
+    "F"
   ],
   "judge": "codex"
 }
