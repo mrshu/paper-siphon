@@ -1,1 +1,14 @@
-{"judge":"claude","scores":{"A":{"text":0,"tables":0,"math":0,"structure":1,"evidence":"Font-decoding failure: text dominated by corrupted symbol/dingbat glyphs where the page images show normal English; only a few markdown heading markers survive and all content is unreadable."},"B":{"text":6,"tables":1,"math":5,"structure":5,"evidence":"Prose mostly readable but Table 1 is entirely absent and part of the page-1/2 body text is dropped; literal 'GLYPH' tokens appear where special chars failed and 'Baden-Wurttember' is mangled."},"C":{"text":9,"tables":9,"math":8,"structure":9,"evidence":"Cleanest rendering: full Table 1 as a well-formed markdown table, correct Unicode (Wuerttemberg, degree signs, microfarads, diameter symbol, subscripts), complete heading hierarchy and faithful image placeholders."},"D":{"text":6,"tables":9,"math":8,"structure":7,"evidence":"Full table intact with correct Unicode, but systematic ligature loss drops the f in fi/ff/fl throughout (fth, gure, xes, specications, dierent, reective) and anchor-link cruft clutters the text."}},"ranking":["C","D","B","A"]}
+{
+  "scores": {
+    "A": {"text": 1, "tables": 1, "math": 1, "structure": 1, "evidence": "scrambled glyphs — broken font encoding"},
+    "B": {"text": 7, "tables": 2, "math": 6, "structure": 7, "evidence": "faithful prose and ## headings, but Table 1 entirely omitted and GLYPH mojibake artifacts (e.g. turingGLYPH)"},
+    "C": {"text": 9, "tables": 9, "math": 8, "structure": 8, "evidence": "faithful prose, clean accurate markdown pipe table incl merged rows; some headings lack # markup"},
+    "D": {"text": 8, "tables": 3, "math": 5, "structure": 5, "evidence": "faithful prose but Table 1 linearized to one-cell-per-line list; degree signs mangled to apostrophes (45', 90', 155'C)"},
+    "E": {"text": 6, "tables": 9, "math": 8, "structure": 8, "evidence": "accurate markdown table and proper LaTeX degrees ($31^{\\circ}$), good heading anchors, but systematic fi/fl ligature loss (fth, xes, reective)"},
+    "F": {"text": 2, "tables": 1, "math": 1, "structure": 1, "evidence": "catastrophic hallucination — hundreds of repeated 'AI-driven robot' lines, <|LOC_|> tokens, table collapsed to endless dashes"},
+    "G": {"text": 9, "tables": 9, "math": 8, "structure": 9, "evidence": "faithful prose, accurate HTML table, clean full markdown heading hierarchy; only minor author-name typo"},
+    "H": {"text": 6, "tables": 8, "math": 8, "structure": 5, "evidence": "faithful prose and accurate HTML table, but raw layout-detection JSON (bbox/category) leaks into body and a section heading is dropped"}
+  },
+  "ranking": ["G", "C", "E", "H", "B", "D", "F", "A"],
+  "judge": "claude"
+}

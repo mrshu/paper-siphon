@@ -1,39 +1,71 @@
 {
   "scores": {
     "A": {
+      "text": 1,
+      "tables": 0,
+      "math": 2,
+      "structure": 1,
+      "evidence": "Heavy LOC tags, duplicated abstract/intro lines, massive hallucinated repeated URL, no usable visible tables and only minimal title math."
+    },
+    "B": {
+      "text": 8,
+      "tables": 4,
+      "math": 7,
+      "structure": 8,
+      "evidence": "Prose/order mostly faithful, but Table 1 columns are shifted with Params blank, and Eq.2 has MSA misread as MS."
+    },
+    "C": {
+      "text": 8,
+      "tables": 9,
+      "math": 9,
+      "structure": 6,
+      "evidence": "Text, formulas, and Table 1 are accurate, but output is interleaved JSON layout records rather than clean Markdown and includes sidebar/header artifacts."
+    },
+    "D": {
+      "text": 7,
+      "tables": 1,
+      "math": 3,
+      "structure": 6,
+      "evidence": "Main prose is mostly present, but equations are badly garbled and Table 1 loses most numeric columns/row structure."
+    },
+    "E": {
       "text": 9,
       "tables": 0,
       "math": 9,
       "structure": 8,
-      "evidence": "Prose and equations 1-4 are faithful, but visible Table 1 is entirely missing and heading levels are inconsistent."
+      "evidence": "Excellent prose and equations, but visible Table 1 is omitted entirely while surrounding text continues past it."
     },
-    "B": {
+    "F": {
       "text": 8,
-      "tables": 8,
-      "math": 3,
+      "tables": 9,
+      "math": 2,
       "structure": 8,
-      "evidence": "Good prose and Table 1, but equations 1-3 are replaced by formula-not-decoded and inline math is flattened with spacing artifacts."
+      "evidence": "Prose and Table 1 are good, but displayed equations are mostly replaced by formula-not-decoded placeholders/gibberish."
     },
-    "C": {
+    "G": {
       "text": 9,
       "tables": 9,
       "math": 9,
       "structure": 8,
-      "evidence": "Faithful prose, Table 1, and equations; minor citation/link clutter and some odd heading levels around Method/Setup."
+      "evidence": "Faithful prose, equations, image/caption placement, and Table 1; minor artifacts include repeated page headers and sidebar/page-anchor noise."
     },
-    "D": {
+    "H": {
       "text": 8,
-      "tables": 4,
-      "math": 6,
-      "structure": 8,
-      "evidence": "Prose mostly intact, but Table 1 columns are shifted/mislabeled and equation 2 drops MSA to MS with other math formatting damage."
+      "tables": 9,
+      "math": 8,
+      "structure": 7,
+      "evidence": "Good prose, equations, and Table 1, but excessive citation anchors/link markup and inconsistent heading levels clutter reading order."
     }
   },
   "ranking": [
+    "G",
     "C",
-    "A",
+    "H",
+    "E",
     "B",
-    "D"
+    "F",
+    "D",
+    "A"
   ],
   "judge": "codex"
 }

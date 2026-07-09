@@ -1,34 +1,62 @@
 {
-  "judge": "claude",
   "scores": {
     "A": {
       "text": 9,
       "tables": 5,
       "math": 9,
-      "structure": 9,
-      "evidence": "Faithful prose with proper ## heading hierarchy, figure captions, and reference anchors preserved; display eqns as LaTeX with \\tag{1}/\\tag{2} and inline $\\mathcal{H}(\\mathbf{x})$; only nits: authors merged onto one line and '8*×*deeper' italic artifact. Excerpt ends at Sec 4.1 before any table."
+      "structure": 8,
+      "evidence": "Clean faithful prose through p5 top, zero garbling or cruft. Full LaTeX math with \\mathcal/\\mathbf and numbered display eqs (1)(2) via \\tag. Perfect reading order; footnote handled inline; cleanly omits the Fig.3 architecture dump. Only minus: plain-text headings (no markdown) and no figure captions/placeholders. No tables reached (neutral)."
     },
     "B": {
       "text": 8,
       "tables": 5,
-      "math": 6,
-      "structure": 7,
-      "evidence": "Prose faithful with ## headings and <!-- image --> placeholders, but inline math flattened to plain 'H ( x )', subscripts rendered as W$\\_{i}$, display eqns lack tag numbers, and HTML entities ('&amp;', '152 layers-8 ×') leak. Excerpt ends before any table."
+      "math": 8,
+      "structure": 5,
+      "evidence": "Faithful prose, good LaTeX with numbered eqs. But structure marred by ~110 lines transcribing the Fig.3 VGG-19/plain/residual architecture as vertical arrow lists (lines 122-235) and fragmented Fig.2 into stray token lines (32-47). No tables reached (neutral)."
     },
     "C": {
       "text": 9,
       "tables": 5,
       "math": 9,
-      "structure": 6,
-      "evidence": "Cleanest prose, merges paragraphs across page breaks; excellent LaTeX inline math and display eqns with \\tag{1}/\\tag{2}; but section titles are plain lines ('Abstract','1. Introduction') not markdown headings and figure captions are dropped. Excerpt ends before any table."
+      "structure": 9,
+      "evidence": "Cleanest overall: faithful prose, proper markdown headings, figure captions in place, footnotes well placed, no figure-dump noise. Full LaTeX math with \\mathcal/\\mathbf and numbered eqs (1)(2). Ends mid-p5 (cut at 'validation imag'). No tables reached (neutral)."
     },
     "D": {
       "text": 6,
       "tables": 5,
-      "math": 2,
-      "structure": 4,
-      "evidence": "Equations (1) and (2) lost as '<!-- formula-not-decoded -->' and inline math flattened; reading-order error drops author 'Jian Sun' from the header and floats it into the middle of page 2; word-merge 'Wehypothesize' and curly-to-straight quote damage ('levels'). Excerpt ends before any table."
+      "math": 4,
+      "structure": 5,
+      "evidence": "Garbled/duplicated author block dropped into the middle of the abstract with 'Keating He' misspelling (lines 8-17). No LaTeX: inline math is plain spaced symbols ('H(x)', 'W 2 σ(W 1 x)'), eqs only inline with (1)(2). Plain headings, footnote inserted mid-text. No tables reached (neutral)."
+    },
+    "E": {
+      "text": 8,
+      "tables": 5,
+      "math": 3,
+      "structure": 7,
+      "evidence": "Faithful prose and clean markdown/image placeholders, but math is the weak point: both display equations (1) and (2) are dropped as '<!-- formula-not-decoded -->' and inline math is degraded spaced symbols. Author 'Jian Sun' misplaced mid-intro (line 37); &amp; entities. No tables reached (neutral)."
+    },
+    "F": {
+      "text": 8,
+      "tables": 5,
+      "math": 9,
+      "structure": 7,
+      "evidence": "Faithful prose and excellent LaTeX math with numbered eqs via \\tag. Cluttered by heavy reference-link cruft '[\\[41\\]](#page-8-0)' and scattered '<span id=...>' anchors that reduce cleanliness though remain parseable. Reading order fine. No tables reached (neutral)."
+    },
+    "G": {
+      "text": 4,
+      "tables": 5,
+      "math": 7,
+      "structure": 3,
+      "evidence": "Clean faithful prose and good inline LaTeX for eqs (1)(2) through line 75, then a catastrophic repetition loop: 'pool size: 128' repeated hundreds of times (Fig.3 dump degenerated, line 77) destroying the tail. Plain headings; 'imageNet' lowercase glitch. No tables reached (neutral)."
+    },
+    "H": {
+      "text": 8,
+      "tables": 5,
+      "math": 6,
+      "structure": 8,
+      "evidence": "Faithful prose, authors correct, clean markdown headings, image placeholders and figure captions in place, good reading order. Math partially degraded: display eqs kept as LaTeX but missing eq numbers, inline degraded with spaced symbols and odd 'W$\\_{i}$' subscript escaping. &amp; entities. No tables reached (neutral)."
     }
   },
-  "ranking": ["A", "C", "B", "D"]
+  "ranking": ["C", "A", "F", "H", "B", "E", "D", "G"],
+  "judge": "claude"
 }

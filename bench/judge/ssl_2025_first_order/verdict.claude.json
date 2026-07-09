@@ -1,1 +1,62 @@
-{"judge":"claude","scores":{"A":{"text":9,"tables":5,"math":9,"structure":8,"evidence":"Faithful prose (even preserves source glyph artifacts 'ıs/łis') and correct LaTeX eq.1 with \\tag{1}; but Table 1 and Table 2 merge data into the header cell leaving the value column empty ('Rated Phase Current... 9.2A (8.6A)' | blank; 'Ball Exposure Area Percentage 82%' | blank), and Table 3 has spurious trailing empty columns."},"B":{"text":8,"tables":7,"math":3,"structure":6,"evidence":"Tables 1 and 3 structurally correct but Table 2 has the same header-merge error; eq.1 mangled (denominator split as r0/a then 2/(2λl)N, exponent becomes e^{-ρ/2 x} instead of e^{-α/l x}); title downgraded to H2 as 'small Size League' and a/l symbol words dropped from text."},"C":{"text":7,"tables":9,"math":2,"structure":5,"evidence":"All three tables including Table 2 are structurally correct (best tables), but eq.1 is emitted as '<!-- formula-not-decoded -->', dribbler bullets reordered (Self-Centering before Shock Absorption), and figure-label text is dumped into body ('DM3519 FOC controller X4 High power board...', '(1) ball leaving', '2023-4 SSL Robot Design')."},"D":{"text":9,"tables":6,"math":8,"structure":6,"evidence":"Clean faithful prose and near-correct LaTeX eq.1 (only drops one 'l' in a/2λl); goes furthest into the paper, but Table 2 (Essential Physical Specifications) is omitted entirely and all headings are rendered as plain text without markdown hierarchy (# markers)."}},"ranking":["A","D","B","C"]}
+{
+  "scores": {
+    "A": {
+      "text": 9,
+      "tables": 9,
+      "math": 3,
+      "structure": 8,
+      "evidence": "Faithful full-text conversion of the paper; prose intact through Sec 3.4. All three tables (DM3519, Physical Specs, 1020/DT4) rendered correctly as GFM. Main weakness: solenoid Eq. (1) emitted as '<!-- formula-not-decoded -->' (dropped), though inline variable definitions survive. Minor: dribbler bullet order swapped and a few loose figure-caption fragments (e.g. 'DM3519 FOC controller X4'). Clean heading hierarchy and reading order."
+    },
+    "B": {
+      "text": 1,
+      "tables": 1,
+      "math": 0,
+      "structure": 1,
+      "evidence": "Catastrophically broken. Every line carries raw '<|LOC_..|>' coordinate tokens, and after the first Introduction sentence it collapses into an endless repetition loop of 'It is a group that has been the number of the Imperial College Robotics Society (ICRS)' filling the entire output. No tables, no math, virtually no usable content reached. Worst output."
+    },
+    "C": {
+      "text": 8,
+      "tables": 9,
+      "math": 6,
+      "structure": 5,
+      "evidence": "Clean markdown with correct HTML tables for all three tables. Eq. (1) rendered as LaTeX but with an error (denominator shows (l_a)^2 instead of (rho/a)^2) and a garbled var definition ('r_0 is the cross-sectional area'). Prose faithful. Major structural flaw: the tail (Sec 3.4 and Sec 4) is dumped as a raw JSON array of layout bbox/category blocks instead of prose."
+    },
+    "D": {
+      "text": 9,
+      "tables": 9,
+      "math": 7,
+      "structure": 7,
+      "evidence": "Very clean, faithful conversion. Full prose, correct GFM tables for all three, sensible figure placeholders and good reading order. Eq. (1) usable LaTeX (minor: 2-lambda vs 2-lambda-l, dropped a couple var subscripts). Weakness: section titles ('1 Introduction', '2.2 Wheelbase') are plain text lines, not markdown headers, so heading structure is implicit."
+    },
+    "E": {
+      "text": 9,
+      "tables": 6,
+      "math": 8,
+      "structure": 7,
+      "evidence": "Faithful prose with proper ##/#### headers and correct LaTeX for Eq. (1) (rho/a intact). Table damage: Table 1 'Rated Phase Current...9.2A' and Table 2 'Ball Exposure Area Percentage 82%' rows collapse label+value into one cell; Table 3 has spurious empty trailing columns. Also injects running header '#### 6 M. Liang et al.' mid-flow."
+    },
+    "F": {
+      "text": 9,
+      "tables": 9,
+      "math": 8,
+      "structure": 8,
+      "evidence": "Cleanest of the strong outputs. Full faithful prose, proper markdown heading hierarchy, all three tables as correct HTML, and Eq. (1) as good LaTeX with rho/a and full var definitions. Figure placeholders with captions preserved. Only noise is retained running page headers ('2 M. Liang et al.', page-number lines) interleaved in the flow. Best output."
+    },
+    "G": {
+      "text": 8,
+      "tables": 7,
+      "math": 4,
+      "structure": 6,
+      "evidence": "Readable prose with ## headers and mostly-correct GFM tables (Table 2 'Ball Exposure Area Percentage 82%' merged into one cell). Eq. (1) is structurally garbled: the (r_0/(a/2-lambda-l)N+r_0) grouping is broken and the exponent becomes e^{-rho/2 x}. Noise: stray 'Other' fragments around Fig. 4, doubled '- -' bullet markers, dropped var symbols."
+    },
+    "H": {
+      "text": 7,
+      "tables": 2,
+      "math": 1,
+      "structure": 3,
+      "evidence": "Prose is largely readable but flat plain text with no markdown headings and scattered running headers. Tables destroyed: rendered as sequential one-value-per-line dumps, and Table 2's data is entirely missing (only its caption survives). Eq. (1) is a degenerate loop 'F = 8pi ( d d d d ...)' of hundreds of partial-derivative symbols. Near-worst, above B only because most body text is present."
+    }
+  },
+  "ranking": ["F", "D", "A", "E", "C", "G", "H", "B"],
+  "judge": "claude"
+}

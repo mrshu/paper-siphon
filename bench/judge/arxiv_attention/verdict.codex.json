@@ -1,39 +1,71 @@
 {
   "scores": {
     "A": {
-      "text": 8,
-      "tables": 8,
-      "math": 3,
-      "structure": 7,
-      "evidence": "Good prose coverage through section 4 and Table 1, but all displayed equations are replaced by formula-not-decoded and Figure 1/2 diagram text is jumbled into the reading flow."
+      "text": 9,
+      "tables": 9,
+      "math": 9,
+      "structure": 9,
+      "evidence": "Very faithful prose and headings with correct Table 1 and main equations; minor nits include duplicated image filename for Figures 1/2 and truncated ending."
     },
     "B": {
       "text": 8,
       "tables": 9,
-      "math": 8,
-      "structure": 8,
-      "evidence": "Strong prose, equations, and Table 1; minor damage includes noisy citation links, malformed footnote HTML, and garbled parameter-matrix superscripts after MultiHead."
-    },
-    "C": {
-      "text": 9,
-      "tables": 9,
       "math": 9,
       "structure": 8,
-      "evidence": "Very faithful prose, equations, and Table 1; misses the visible Google permission notice and mostly omits figure/diagram content, with plain rather than consistent heading markup."
+      "evidence": "Good prose, equations, and Table 1; misses the top permission/arXiv details and Figure 1 caption/image, with flatter heading hierarchy."
+    },
+    "C": {
+      "text": 7,
+      "tables": 7,
+      "math": 3,
+      "structure": 7,
+      "evidence": "Prose mostly present but author order/details and hyphenation are damaged; several equations are replaced by formula-not-decoded, while Table 1 is usable but math is spaced/plain."
     },
     "D": {
       "text": 7,
-      "tables": 8,
-      "math": 6,
+      "tables": 7,
+      "math": 5,
       "structure": 7,
-      "evidence": "Captures most prose and Table 1, but has OCR/math damage such as h_t_-_1 and spaced-out LaTeX, a typo in sequence-aligned, and hallucinated Flow chart text near Figure 2."
+      "evidence": "Mostly complete prose but OCR/math markup is noisy like h_{t}_{-}_{1} and 1 sqrt subscripts; Table 1 structure is present with degraded math."
+    },
+    "E": {
+      "text": 3,
+      "tables": 2,
+      "math": 4,
+      "structure": 3,
+      "evidence": "Large repeated garbled author/email block before readable body; Table 1 is plain line text rather than structured rows/columns, though some equations are recognizable."
+    },
+    "F": {
+      "text": 8,
+      "tables": 9,
+      "math": 9,
+      "structure": 6,
+      "evidence": "High-fidelity prose, math, and Table 1, but raw bbox JSON is inserted into the reading flow and disrupts page/section structure."
+    },
+    "G": {
+      "text": 1,
+      "tables": 0,
+      "math": 2,
+      "structure": 1,
+      "evidence": "Severe hallucination and repetition with LOC tokens and altered prose; no usable tables in the provided start and structure is largely broken."
+    },
+    "H": {
+      "text": 8,
+      "tables": 9,
+      "math": 6,
+      "structure": 8,
+      "evidence": "Good prose and Table 1, but inline math is often flattened or garbled such as ht\u2212sup1, dmodel, and projection matrices rendered as broken superscripts."
     }
   },
   "ranking": [
-    "C",
+    "A",
     "B",
+    "F",
+    "H",
     "D",
-    "A"
+    "C",
+    "E",
+    "G"
   ],
   "judge": "codex"
 }

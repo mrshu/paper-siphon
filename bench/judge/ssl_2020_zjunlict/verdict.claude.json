@@ -1,34 +1,62 @@
 {
-  "judge": "claude",
   "scores": {
     "A": {
       "text": 9,
       "tables": 5,
       "math": 9,
-      "structure": 9,
-      "evidence": "Faithful prose, footnote preserved; equations rendered as LaTeX with all \\tag numbers (1)-(7); consistent ### heading hierarchy; only nit is degree shown as \\u25e6 ring instead of °."
+      "structure": 7,
+      "evidence": "Faithful prose throughout, no garbling or loops. Equations rendered as clean $$ LaTeX (eqs 1-7 correct). Weakness: most section headings emitted as plain text ('1 Introduction', '2 Modification of...') with only a few '#'/'###' markers, so heading markup is inconsistent though reading order is correct."
     },
     "B": {
       "text": 6,
       "tables": 5,
-      "math": 7,
-      "structure": 8,
-      "evidence": "Degree symbol corrupted to literal 'GLYPH' three times (0.087 GLYPH, 0.17 GLYPH); spurious 'Line chart' inserted before Fig 9; 'Rong Xiong1' missing superscript; equations correct LaTeX but lack equation numbers."
+      "math": 4,
+      "structure": 3,
+      "evidence": "Underlying prose is present and faithful, but multiple pages are dumped as raw JSON layout arrays ([{\"bbox\":...,\"category\":...}]) interspersed with the text, severely damaging structure and readability. Content duplicated inside the JSON blocks; math region reached only in plain-text tail."
     },
     "C": {
+      "text": 8,
+      "tables": 5,
+      "math": 5,
+      "structure": 6,
+      "evidence": "Complete, faithful plain text with no token noise, loops, or hallucination. But no markdown headings at all and running page-headers ('Z. Huang et al.') left inline; equations degraded to plain inline form ('M = µmgr = 2 / 5 mr 2 β') rather than LaTeX, still readable."
+    },
+    "D": {
+      "text": 3,
+      "tables": 5,
+      "math": 3,
+      "structure": 2,
+      "evidence": "Pervasive <|LOC_..|> coordinate tokens appended to most lines. Abstract and Introduction each duplicated. Hallucinated repetition loop of flowchart labels ('Decision layer + Motion planner + ... + Control system + Control system + Co'). Broken output."
+    },
+    "E": {
       "text": 9,
       "tables": 5,
       "math": 9,
-      "structure": 8,
-      "evidence": "Clean faithful prose with curly quotes; equations as LaTeX with numbers and correct degree symbol $0.087^\\circ$; headings present but inconsistent markup (plain '1 Introduction' without #)."
+      "structure": 9,
+      "evidence": "Clean, consistent markdown headings (#/##/###), well-formed $$ LaTeX equations with numbers, figures captioned. Correct reading order. Minor: a few running page-headers ('2 Z. Huang et al.') left as inline lines between sections."
     },
-    "D": {
-      "text": 4,
-      "tables": 4,
+    "F": {
+      "text": 9,
+      "tables": 5,
+      "math": 9,
+      "structure": 9,
+      "evidence": "Cleanest conversion: consistent markdown headings, $$ LaTeX equations with \\tag numbering, <sup> superscripts, best handling of running headers. Faithful prose. Minor: one running header mis-marked as a '#### 4 Z. Huang et al.' heading."
+    },
+    "G": {
+      "text": 6,
+      "tables": 5,
       "math": 2,
-      "structure": 3,
-      "evidence": "All equations lost to '<!-- formula-not-decoded -->'; block-diagram box labels dumped mid-sentence ('Decision layer...Global vision from the original 360 lines') and plot axis numbers injected into prose, badly breaking reading order."
+      "structure": 4,
+      "evidence": "Proper ## headings and image placeholders, but ALL seven equations dropped as '<!-- formula-not-decoded -->'. Figure content leaks into the text flow: chart axis tick values ('0.6','0.4','-0.1') and flowchart labels ('Decision layer','Robots','rotate control') dumped mid-paragraph, disrupting reading order."
+    },
+    "H": {
+      "text": 8,
+      "tables": 5,
+      "math": 8,
+      "structure": 8,
+      "evidence": "Proper ## headings and decoded $$ LaTeX equations (eqs 1-7 correct). Reading order clean. Deductions: degree symbols corrupted to 'GLYPH' ('0.087 GLYPH'), a stray 'Line chart' label near Fig. 9, and one dropped superscript ('Rong Xiong1')."
     }
   },
-  "ranking": ["A", "C", "B", "D"]
+  "ranking": ["F", "E", "A", "H", "C", "G", "B", "D"],
+  "judge": "claude"
 }

@@ -1,39 +1,71 @@
 {
   "scores": {
     "A": {
-      "text": 8,
+      "text": 9,
       "tables": 10,
-      "math": 7,
+      "math": 9,
       "structure": 8,
-      "evidence": "Mostly faithful for shown pages, but misses visible PCIe-connector paragraph on page 6, has malformed bullets and spaced-out equation symbols."
+      "evidence": "Prose is largely faithful through shown pages, with minor citation/page-header artifacts like 'Small Size League 1' and inserted running headers; visible equation is good."
     },
     "B": {
       "text": 9,
       "tables": 10,
-      "math": 9,
-      "structure": 9,
-      "evidence": "Very faithful prose and hierarchy for shown pages; equation is clean LaTeX, with only minor caption/image omissions and a questionable time-delay formula beyond page 8 sample."
+      "math": 8,
+      "structure": 8,
+      "evidence": "Good prose and headings, but figure images are mostly dropped to captions and page header '4 The Delft Mercurians' becomes a heading; visible deceleration equation is captured well."
     },
     "C": {
       "text": 8,
       "tables": 10,
-      "math": 8,
-      "structure": 7,
-      "evidence": "Good prose and math on shown pages, but page headers like '4 The Delft Mercurians' become headings and figure/page anchors interrupt reading order."
-    },
-    "D": {
-      "text": 7,
-      "tables": 10,
       "math": 4,
       "structure": 6,
-      "evidence": "Prose mostly present, but page headers are merged, figure OCR text intrudes into flow, bullets are malformed, and the page 8 equation is replaced by formula-not-decoded."
+      "evidence": "Most prose is present, but figure subcaptions are misplaced, list bullets are malformed, and the visible deceleration equation is replaced by '<!-- formula-not-decoded -->'."
+    },
+    "D": {
+      "text": 8,
+      "tables": 10,
+      "math": 8,
+      "structure": 7,
+      "evidence": "Clean prose and usable math, but many visible figure captions/subcaptions/images from pages 3-6 are omitted, reducing structure and visual-content fidelity."
+    },
+    "E": {
+      "text": 2,
+      "tables": 10,
+      "math": 6,
+      "structure": 2,
+      "evidence": "Output is polluted with LOC tokens, duplicates title/abstract/text, hallucinates huge repeated 1500 number, and has OCR word errors like 'Embestrical'."
+    },
+    "F": {
+      "text": 5,
+      "tables": 10,
+      "math": 7,
+      "structure": 3,
+      "evidence": "Drops the '2 Hardware' and '2.1 Wheels' heading/start paragraphs, injects raw JSON layout blocks, and later has math errors such as missing dotted velocity in state estimate."
+    },
+    "G": {
+      "text": 8,
+      "tables": 10,
+      "math": 5,
+      "structure": 6,
+      "evidence": "Prose order is mostly faithful but headings are plain text, running headers intrude, and math is degraded to plain/OCR text like 'a decel = 5(1 + k care ) a accel'."
+    },
+    "H": {
+      "text": 5,
+      "tables": 10,
+      "math": 5,
+      "structure": 3,
+      "evidence": "Early pages are mostly present, but page 6 drops the paragraph about previous PCIe connectors, bullets are malformed, equation spacing/OCR is poor, and heading becomes 'GLYPHGLYPH... Strategy Design'."
     }
   },
   "ranking": [
-    "B",
-    "C",
     "A",
-    "D"
+    "B",
+    "D",
+    "G",
+    "C",
+    "F",
+    "H",
+    "E"
   ],
   "judge": "codex"
 }

@@ -1,1 +1,62 @@
-{"judge":"claude","scores":{"A":{"text":8,"tables":8,"math":8,"structure":7,"evidence":"Prose faithful across visible pages with markdown heading hierarchy (## Hardware/2.1 Wheels); a_decel formula correct LaTeX; but Fig 3/4 captions clustered out of order and Fig 2 (a)/(b) subcaptions dropped."},"B":{"text":9,"tables":8,"math":9,"structure":6,"evidence":"Cleanest prose with proper superscripts, curly quotes and en-dashes; best math (a_decel and Kalman \\hat{x} in correct LaTeX); but headings lost markdown markup (plain '1 Introduction','2 Hardware') and Fig 2-7 captions/image placeholders omitted entirely."},"C":{"text":8,"tables":8,"math":9,"structure":8,"evidence":"Faithful text with sup superscripts and preserved cross-reference links; correct a_decel formula; best figure-caption reading order (Fig 2 (a)/(b), Fig 3, Fig 5 (a)(b)(c)); minor nit: contact URL mangled 'https://delftmercurians](...).nl/' and running headers inlined as headings."},"D":{"text":5,"tables":6,"math":2,"structure":4,"evidence":"Dropped the a_decel equation ('<!-- formula-not-decoded -->') and dumped Figure 8 plot axis tick labels as garbled numeric prose ('Position (m) 4.0 3.5...'); superscripts flattened to plain '1', URL spaced 'nl/', and running headers injected as bullets ('- 2 The Delft Mercurians')."}},"ranking":["C","B","A","D"]}
+{
+  "scores": {
+    "A": {
+      "text": 9,
+      "tables": 5,
+      "math": 9,
+      "structure": 9,
+      "evidence": "Complete and faithful prose through the strategy section; markdown headings, footnotes and figure captions preserved. Kalman equation rendered correctly with velocity-hat-dot; a_decel in proper LaTeX; good_shot as LaTeX. Minor noise: repeated image_1.png refs, inline page-number lines and HTML flex divs for figure layout. No tables present (neutral)."
+    },
+    "B": {
+      "text": 9,
+      "tables": 5,
+      "math": 8,
+      "structure": 8,
+      "evidence": "Complete, faithful text with proper headings and captions. a_decel correct LaTeX; Kalman slightly degraded (velocity hat missing the dot). Cluttered with PDF cross-reference anchors (#page-15-0 etc.) inline, and some heading levels inconsistent. No tables present (neutral)."
+    },
+    "C": {
+      "text": 8,
+      "tables": 5,
+      "math": 3,
+      "structure": 5,
+      "evidence": "Prose complete and in order. But the a_decel equation is dropped as 'formula-not-decoded', Kalman is plaintext, and Figure 8's axis tick numbers are dumped as scattered jumbled text. Image placeholders only. No tables present (neutral)."
+    },
+    "D": {
+      "text": 9,
+      "tables": 5,
+      "math": 8,
+      "structure": 7,
+      "evidence": "Clean, complete text, good reading order. a_decel and good_shot in LaTeX; Kalman has a double-hat error on the velocity term. Headings are plain numbered lines rather than markdown-marked, slightly weakening structure. No tables present (neutral)."
+    },
+    "E": {
+      "text": 2,
+      "tables": 5,
+      "math": 2,
+      "structure": 2,
+      "evidence": "Broken: pervasive <|LOC_...|> tokens on nearly every line, duplicated header/abstract blocks, 'Embestrical' typo, and a catastrophic loop where '1500 euros' becomes a runaway multi-hundred-digit number. Severely damaged conversion."
+    },
+    "F": {
+      "text": 6,
+      "tables": 5,
+      "math": 8,
+      "structure": 3,
+      "evidence": "Math is correct LaTeX, but two large raw JSON layout dumps ([{\"bbox\":...}]) are embedded mid-document, and the '2 Hardware / 2.1 Wheels' heading plus the first wheels paragraph are dropped. Raw JSON blobs badly damage structure. No tables present (neutral)."
+    },
+    "G": {
+      "text": 9,
+      "tables": 5,
+      "math": 4,
+      "structure": 6,
+      "evidence": "Complete, faithful prose with good reading order. However all math is plaintext with broken spacing (a decel = 5(1 + k care ) a accel; good_shot = ... ^ ... ^ -...), no LaTeX. Headings plain numbered lines. No tables present (neutral)."
+    },
+    "H": {
+      "text": 6,
+      "tables": 5,
+      "math": 7,
+      "structure": 5,
+      "evidence": "Markdown with LaTeX a_decel, but the 4.2 heading is garbled as 'GLYPHGLYPHGLYPHGLYPH Strategy Design' and a block of strategy content (situations paragraphs, node-type list, good_shot equation) is dropped. Kalman is plaintext. Section 4.3 recovered fully. No tables present (neutral)."
+    }
+  },
+  "ranking": ["A", "B", "D", "G", "H", "C", "F", "E"],
+  "judge": "claude"
+}

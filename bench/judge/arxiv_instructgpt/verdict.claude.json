@@ -1,1 +1,62 @@
-{"judge":"claude","scores":{"A":{"text":9,"tables":5,"math":6,"structure":9,"evidence":"Faithful prose with italics preserved and rich cross-reference/page anchor links; only glitch is a garbled footnote-3 anchor (<sup>&</sup>lt;sup>3</sup>). No data tables reached in excerpt; inline stats kept as plain unicode."},"B":{"text":8,"tables":5,"math":6,"structure":7,"evidence":"Accurate text but merges 'A goal' into 'Agoal' and converts curly quotes to single quotes; authors fragmented one-per-line and figures shown as <!-- image --> placeholders."},"C":{"text":8,"tables":5,"math":8,"structure":6,"evidence":"Good prose and best inline LaTeX ($85 \\pm 3\\%$, $^3$), but top-level headings (Abstract, 1 Introduction, 2 Related work) are plain text with no # markup, and drops 'to outputs' in the held-out-labelers sentence."},"D":{"text":7,"tables":6,"math":7,"structure":8,"evidence":"Renders the author block as a well-formed markdown table and uses ## headings, but misreads 'Tamkin' as 'Tamarin' in the intro citation list and drops the x from '100x fewer parameters'."}},"ranking":["A","B","D","C"]}
+{
+  "scores": {
+    "A": {
+      "text": 7,
+      "tables": 5,
+      "math": 6,
+      "structure": 5,
+      "evidence": "Faithful prose, complete through p5. But quotes flattened to apostrophes throughout, OCR error in email ('1owe@openai . com' for lowe@openai.com), and structure is flat: no markdown headings, no bold on finding paragraphs, authors one-per-line. No tables in covered pages (neutral)."
+    },
+    "B": {
+      "text": 9,
+      "tables": 5,
+      "math": 9,
+      "structure": 8,
+      "evidence": "Clean, faithful text with proper curly quotes and footnote markers ($^3$). Bold finding headings, grouped author rows, LaTeX math ($85 \\pm 3\\%$). Section headers present. No JSON/loops/artifacts. No tables visible (neutral)."
+    },
+    "C": {
+      "text": 8,
+      "tables": 5,
+      "math": 6,
+      "structure": 4,
+      "evidence": "Good text with italics/bold headings, but a large block (p5 remainder + related-work intro) is dumped as a raw JSON array of {bbox,category,text} objects mid-document — a glaring reading-order/structure artifact. Math plain (85 ± 3%). Text within JSON is accurate but rendered broken."
+    },
+    "D": {
+      "text": 7,
+      "tables": 5,
+      "math": 6,
+      "structure": 6,
+      "evidence": "## headings present and image placeholders, but author block fragmented one-per-line, quotes flattened to apostrophes, merge error 'Agoal', stray spaces ('InstructGPT .'). Finding headings not bolded. Complete prose. Math plain."
+    },
+    "E": {
+      "text": 9,
+      "tables": 6,
+      "math": 9,
+      "structure": 9,
+      "evidence": "Strongest: clean text, curly quotes, italics, footnote markers ([^1]), author superscripts, bold finding headings, and Figure 2 reconstructed as an HTML table preserving step labels. Proper LaTeX math ($85 \\pm 3\\%$, $73.4 \\pm 2\\%$). No artifacts."
+    },
+    "F": {
+      "text": 7,
+      "tables": 5,
+      "math": 6,
+      "structure": 7,
+      "evidence": "## headings and author list as a markdown table, but OCR corruptions: 'Tamarin et al.' for Tamkin, and '100 fewer parameters' drops the 'x' (100x). Straight quotes, finding headings not bolded. Math plain. Otherwise complete."
+    },
+    "G": {
+      "text": 2,
+      "tables": 2,
+      "math": 3,
+      "structure": 1,
+      "evidence": "Broken: <|LOC_..|> coordinate tokens appended to most lines; catastrophic degenerate loop ('175B 175B...' repeated hundreds of times); Figure 2 hallucinated into a looping 'Step 1..20' list; duplicated paragraph; OCR errors ('an average' for avenue, 'love@openai'). Severely damaged."
+    },
+    "H": {
+      "text": 8,
+      "tables": 5,
+      "math": 6,
+      "structure": 6,
+      "evidence": "Faithful prose with proper quotes and italics and # headings, but heavily cluttered with inline citation links (#page-XX anchors) and <span id> HTML anchors; malformed footnote markup ('<sup>&</sup>lt;sup>3</sup>'). Finding headings not bolded. Math plain (85 ± 3%)."
+    }
+  },
+  "ranking": ["E", "B", "H", "A", "D", "F", "C", "G"],
+  "judge": "claude"
+}

@@ -1,0 +1,145 @@
+# NEURAL MACHINE TRANSLATION BY JOINTLY LEARNING TO ALIGN AND TRANSLATE
+
+Dzmitry Bahdanau
+
+Jacobs University Bremen, Germany
+
+KyungHyun Cho Yoshua Bengio<sup>∗</sup> Universite de Montr ´ eal ´
+
+# ABSTRACT
+
+Neural machine translation is a recently proposed approach to machine translation. Unlike the traditional statistical machine translation, the neural machine translation aims at building a single neural network that can be jointly tuned to maximize the translation performance. The models proposed recently for neural machine translation often belong to a family of encoder–decoders and encode a source sentence into a fixed-length vector from which a decoder generates a translation. In this paper, we conjecture that the use of a fixed-length vector is a bottleneck in improving the performance of this basic encoder–decoder architecture, and propose to extend this by allowing a model to automatically (soft-)search for parts of a source sentence that are relevant to predicting a target word, without having to form these parts as a hard segment explicitly. With this new approach, we achieve a translation performance comparable to the existing state-of-the-art phrase-based system on the task of English-to-French translation. Furthermore, qualitative analysis reveals that the (soft-)alignments found by the model agree well with our intuition.
+
+# 1 INTRODUCTION
+
+*Neural machine translation* is a newly emerging approach to machine translation, recently proposed by [Kalchbrenner and Blunsom](#page-10-0) [\(2013\)](#page-10-0), [Sutskever](#page-10-1) *et al.* [\(2014\)](#page-10-1) and Cho *[et al.](#page-9-0)* [\(2014b\)](#page-9-0). Unlike the traditional phrase-based translation system (see, e.g., [Koehn](#page-10-2) *et al.*, [2003\)](#page-10-2) which consists of many small sub-components that are tuned separately, neural machine translation attempts to build and train a single, large neural network that reads a sentence and outputs a correct translation.
+
+Most of the proposed neural machine translation models belong to a family of *encoder– decoders* [\(Sutskever](#page-10-1) *et al.*, [2014;](#page-10-1) Cho *[et al.](#page-9-1)*, [2014a\)](#page-9-1), with an encoder and a decoder for each language, or involve a language-specific encoder applied to each sentence whose outputs are then compared [\(Hermann and Blunsom, 2014\)](#page-10-3). An encoder neural network reads and encodes a source sentence into a fixed-length vector. A decoder then outputs a translation from the encoded vector. The whole encoder–decoder system, which consists of the encoder and the decoder for a language pair, is jointly trained to maximize the probability of a correct translation given a source sentence.
+
+A potential issue with this encoder–decoder approach is that a neural network needs to be able to compress all the necessary information of a source sentence into a fixed-length vector. This may make it difficult for the neural network to cope with long sentences, especially those that are longer than the sentences in the training corpus. Cho *[et al.](#page-9-0)* [\(2014b\)](#page-9-0) showed that indeed the performance of a basic encoder–decoder deteriorates rapidly as the length of an input sentence increases.
+
+In order to address this issue, we introduce an extension to the encoder–decoder model which learns to align and translate jointly. Each time the proposed model generates a word in a translation, it (soft-)searches for a set of positions in a source sentence where the most relevant information is concentrated. The model then predicts a target word based on the context vectors associated with these source positions and all the previous generated target words.
+
+<sup>∗</sup>CIFAR Senior Fellow
+
+The most important distinguishing feature of this approach from the basic encoder–decoder is that it does not attempt to encode a whole input sentence into a single fixed-length vector. Instead, it encodes the input sentence into a sequence of vectors and chooses a subset of these vectors adaptively while decoding the translation. This frees a neural translation model from having to squash all the information of a source sentence, regardless of its length, into a fixed-length vector. We show this allows a model to cope better with long sentences.
+
+In this paper, we show that the proposed approach of jointly learning to align and translate achieves significantly improved translation performance over the basic encoder–decoder approach. The improvement is more apparent with longer sentences, but can be observed with sentences of any length. On the task of English-to-French translation, the proposed approach achieves, with a single model, a translation performance comparable, or close, to the conventional phrase-based system. Furthermore, qualitative analysis reveals that the proposed model finds a linguistically plausible (soft-)alignment between a source sentence and the corresponding target sentence.
+
+# 2 BACKGROUND: NEURAL MACHINE TRANSLATION
+
+From a probabilistic perspective, translation is equivalent to finding a target sentence y that maximizes the conditional probability of y given a source sentence x, i.e., arg max<sup>y</sup> p(y | x). In neural machine translation, we fit a parameterized model to maximize the conditional probability of sentence pairs using a parallel training corpus. Once the conditional distribution is learned by a translation model, given a source sentence a corresponding translation can be generated by searching for the sentence that maximizes the conditional probability.
+
+Recently, a number of papers have proposed the use of neural networks to directly learn this conditional distribution (see, e.g., [Kalchbrenner and Blunsom, 2013;](#page-10-0) Cho *[et al.](#page-9-1)*, [2014a;](#page-9-1) [Sutskever](#page-10-1) *et al.*, [2014;](#page-10-1) Cho *[et al.](#page-9-0)*, [2014b;](#page-9-0) [Forcada and](#page-9-2) Neco, [1997\)](#page-9-2). This neural machine translation approach typ- ˜ ically consists of two components, the first of which encodes a source sentence x and the second decodes to a target sentence y. For instance, two recurrent neural networks (RNN) were used by (Cho *[et al.](#page-9-1)*, [2014a\)](#page-9-1) and [\(Sutskever](#page-10-1) *et al.*, [2014\)](#page-10-1) to encode a variable-length source sentence into a fixed-length vector and to decode the vector into a variable-length target sentence.
+
+Despite being a quite new approach, neural machine translation has already shown promising results. [Sutskever](#page-10-1) *et al.* [\(2014\)](#page-10-1) reported that the neural machine translation based on RNNs with long shortterm memory (LSTM) units achieves close to the state-of-the-art performance of the conventional phrase-based machine translation system on an English-to-French translation task.[1](#page-1-0) Adding neural components to existing translation systems, for instance, to score the phrase pairs in the phrase table (Cho *[et al.](#page-9-1)*, [2014a\)](#page-9-1) or to re-rank candidate translations [\(Sutskever](#page-10-1) *et al.*, [2014\)](#page-10-1), has allowed to surpass the previous state-of-the-art performance level.
+
+### 2.1 RNN ENCODER–DECODER
+
+Here, we describe briefly the underlying framework, called *RNN Encoder–Decoder*, proposed by Cho *[et al.](#page-9-1)* [\(2014a\)](#page-9-1) and [Sutskever](#page-10-1) *et al.* [\(2014\)](#page-10-1) upon which we build a novel architecture that learns to align and translate simultaneously.
+
+In the Encoder–Decoder framework, an encoder reads the input sentence, a sequence of vectors x = (x1, · · · , x<sup>T</sup><sup>x</sup> ), into a vector c. [2](#page-1-1) The most common approach is to use an RNN such that
+
+<span id="page-1-2"></span>
+$$h_t = f\left(x_t, h_{t-1}\right) \tag{1}$$
+
+and
+
+$$c=q\left(\left\{h_1,\cdots,h_{T_x}\right\}\right),\,$$
+
+where h<sup>t</sup> ∈ R <sup>n</sup> is a hidden state at time t, and c is a vector generated from the sequence of the hidden states. f and q are some nonlinear functions. [Sutskever](#page-10-1) *et al.* [\(2014\)](#page-10-1) used an LSTM as f and q ({h1, · · · , h<sup>T</sup> }) = h<sup>T</sup> , for instance.
+
+<span id="page-1-0"></span><sup>1</sup> We mean by the state-of-the-art performance, the performance of the conventional phrase-based system without using any neural network-based component.
+
+<span id="page-1-1"></span><sup>2</sup> Although most of the previous works (see, e.g., Cho *[et al.](#page-9-1)*, [2014a;](#page-9-1) [Sutskever](#page-10-1) *et al.*, [2014;](#page-10-1) [Kalchbrenner and](#page-10-0) [Blunsom, 2013\)](#page-10-0) used to encode a variable-length input sentence into a *fixed-length* vector, it is not necessary, and even it may be beneficial to have a *variable-length* vector, as we will show later.
+
+The decoder is often trained to predict the next word y<sup>t</sup> <sup>0</sup> given the context vector c and all the previously predicted words {y1, · · · , y<sup>t</sup> <sup>0</sup>−1}. In other words, the decoder defines a probability over the translation y by decomposing the joint probability into the ordered conditionals:
+
+$$p(\mathbf{y}) = \prod_{t=1}^{T} p(y_t \mid \{y_1, \dots, y_{t-1}\}, c),$$
+ (2)
+
+where y = y1, · · · , yT<sup>y</sup> . With an RNN, each conditional probability is modeled as
+
+$$p(y_t \mid \{y_1, \dots, y_{t-1}\}, c) = g(y_{t-1}, s_t, c),$$
+ (3)
+
+where g is a nonlinear, potentially multi-layered, function that outputs the probability of yt, and s<sup>t</sup> is the hidden state of the RNN. It should be noted that other architectures such as a hybrid of an RNN and a de-convolutional neural network can be used [\(Kalchbrenner and Blunsom, 2013\)](#page-10-0).
+
+### <span id="page-2-6"></span>3 LEARNING TO ALIGN AND TRANSLATE
+
+In this section, we propose a novel architecture for neural machine translation. The new architecture consists of a bidirectional RNN as an encoder (Sec. [3.2\)](#page-3-0) and a decoder that emulates searching through a source sentence during decoding a translation (Sec. [3.1\)](#page-2-0).
+
+### <span id="page-2-0"></span>3.1 DECODER: GENERAL DESCRIPTION
+
+In a new model architecture, we define each conditional probability in Eq. [\(2\)](#page-2-1) as:
+
+$$p(y_i|y_1,\ldots,y_{i-1},\mathbf{x}) = g(y_{i-1},s_i,c_i),$$
+ (4)
+
+where s<sup>i</sup> is an RNN hidden state for time i, computed by
+
+$$s_i = f(s_{i-1}, y_{i-1}, c_i).$$
+
+It should be noted that unlike the existing encoder–decoder approach (see Eq. [\(2\)](#page-2-1)), here the probability is conditioned on a distinct context vector c<sup>i</sup> for each target word y<sup>i</sup> .
+
+The context vector c<sup>i</sup> depends on a sequence of *annotations* (h1, · · · , hT<sup>x</sup> ) to which an encoder maps the input sentence. Each annotation h<sup>i</sup> contains information about the whole input sequence with a strong focus on the parts surrounding the i-th word of the input sequence. We explain in detail how the annotations are computed in the next section.
+
+The context vector c<sup>i</sup> is, then, computed as a weighted sum of these annotations h<sup>i</sup> :
+
+$$c_i = \sum_{j=1}^{T_x} \alpha_{ij} h_j. \tag{5}$$
+
+The weight αij of each annotation h<sup>j</sup> is computed by
+
+$$\alpha_{ij} = \frac{\exp(e_{ij})}{\sum_{k=1}^{T_x} \exp(e_{ik})},\tag{6}$$
+
+where
+
+$$e_{ij} = a(s_{i-1}, h_j)$$
+
+is an *alignment model* which scores how well the inputs around position j and the output at position i match. The score is based on the RNN hidden state si−<sup>1</sup> (just before emitting y<sup>i</sup> , Eq. [\(4\)](#page-2-2)) and the j-th annotation h<sup>j</sup> of the input sentence.
+
+We parametrize the alignment model a as a feedforward neural network which is jointly trained with all the other components of the proposed system. Note that unlike in traditional machine translation,
+
+<span id="page-2-2"></span><span id="page-2-1"></span><span id="page-2-5"></span><span id="page-2-4"></span><span id="page-2-3"></span>Figure 1: The graphical illustration of the proposed model trying to generate the t-th target word y<sup>t</sup> given a source sentence (x1, x2, . . . , x<sup>T</sup> ).
+
+the alignment is not considered to be a latent variable. Instead, the alignment model directly computes a soft alignment, which allows the gradient of the cost function to be backpropagated through. This gradient can be used to train the alignment model as well as the whole translation model jointly.
+
+We can understand the approach of taking a weighted sum of all the annotations as computing an *expected annotation*, where the expectation is over possible alignments. Let  $\alpha_{ij}$  be a probability that the target word  $y_i$  is aligned to, or translated from, a source word  $x_j$ . Then, the *i*-th context vector  $c_i$  is the expected annotation over all the annotations with probabilities  $\alpha_{ij}$ .
+
+The probability  $\alpha_{ij}$ , or its associated energy  $e_{ij}$ , reflects the importance of the annotation  $h_j$  with respect to the previous hidden state  $s_{i-1}$  in deciding the next state  $s_i$  and generating  $y_i$ . Intuitively, this implements a mechanism of attention in the decoder. The decoder decides parts of the source sentence to pay attention to. By letting the decoder have an attention mechanism, we relieve the encoder from the burden of having to encode all information in the source sentence into a fixed-length vector. With this new approach the information can be spread throughout the sequence of annotations, which can be selectively retrieved by the decoder accordingly.
+
+#### <span id="page-3-0"></span>3.2 ENCODER: BIDIRECTIONAL RNN FOR ANNOTATING SEQUENCES
+
+The usual RNN, described in Eq. (1), reads an input sequence  $\mathbf{x}$  in order starting from the first symbol  $x_1$  to the last one  $x_{T_x}$ . However, in the proposed scheme, we would like the annotation of each word to summarize not only the preceding words, but also the following words. Hence, we propose to use a bidirectional RNN (BiRNN, Schuster and Paliwal, 1997), which has been successfully used recently in speech recognition (see, e.g., Graves *et al.*, 2013).
+
+A BiRNN consists of forward and backward RNN's. The forward RNN  $\overrightarrow{f}$  reads the input sequence as it is ordered (from  $x_1$  to  $x_{T_x}$ ) and calculates a sequence of *forward hidden states*  $(\overrightarrow{h}_1, \cdots, \overrightarrow{h}_{T_x})$ . The backward RNN  $\overleftarrow{f}$  reads the sequence in the reverse order (from  $x_{T_x}$  to  $x_1$ ), resulting in a sequence of *backward hidden states*  $(\overleftarrow{h}_1, \cdots, \overleftarrow{h}_{T_x})$ .
+
+We obtain an annotation for each word  $x_j$  by concatenating the forward hidden state  $\overrightarrow{h}_j$  and the backward one  $\overleftarrow{h}_j$ , i.e.,  $h_j = \left[\overrightarrow{h}_j^\top; \overleftarrow{h}_j^\top\right]^\top$ . In this way, the annotation  $h_j$  contains the summaries of both the preceding words and the following words. Due to the tendency of RNNs to better represent recent inputs, the annotation  $h_j$  will be focused on the words around  $x_j$ . This sequence of annotations is used by the decoder and the alignment model later to compute the context vector (Eqs. (5)–(6)).
+
+See Fig. 1 for the graphical illustration of the proposed model.
+
+### <span id="page-3-4"></span>4 EXPERIMENT SETTINGS
+
+We evaluate the proposed approach on the task of English-to-French translation. We use the bilingual, parallel corpora provided by ACL WMT '14.<sup>3</sup> As a comparison, we also report the performance of an RNN Encoder–Decoder which was proposed recently by Cho *et al.* (2014a). We use the same training procedures and the same dataset for both models.<sup>4</sup>
+
+#### 4.1 DATASET
+
+WMT '14 contains the following English-French parallel corpora: Europarl (61M words), news commentary (5.5M), UN (421M) and two crawled corpora of 90M and 272.5M words respectively, totaling 850M words. Following the procedure described in Cho *et al.* (2014a), we reduce the size of the combined corpus to have 348M words using the data selection method by Axelrod *et al.* (2011).<sup>5</sup> We do not use any monolingual data other than the mentioned parallel corpora, although it may be possible to use a much larger monolingual corpus to pretrain an encoder. We concatenate news-test-
+
+<span id="page-3-1"></span><sup>3</sup> http://www.statmt.org/wmt14/translation-task.html
+
+<span id="page-3-2"></span><sup>&</sup>lt;sup>4</sup> Implementations are available at https://github.com/lisa-groundhog/GroundHog.
+
+<span id="page-3-3"></span><sup>&</sup>lt;sup>5</sup> Available online at http://www-lium.univ-lemans.fr/~schwenk/cslm\_joint\_paper/.
+
+<span id="page-4-2"></span>Figure 2: The BLEU scores of the generated translations on the test set with respect to the lengths of the sentences. The results are on the full test set which includes sentences having unknown words to the models.
+
+2012 and news-test-2013 to make a development (validation) set, and evaluate the models on the test set (news-test-2014) from WMT '14, which consists of 3003 sentences not present in the training data.
+
+After a usual tokenization<sup>6</sup>, we use a shortlist of 30,000 most frequent words in each language to train our models. Any word not included in the shortlist is mapped to a special token ([UNK]). We do not apply any other special preprocessing, such as lowercasing or stemming, to the data.
+
+#### 4.2 Models
+
+We train two types of models. The first one is an RNN Encoder–Decoder (RNNencdec, Cho *et al.*, 2014a), and the other is the proposed model, to which we refer as RNNsearch. We train each model twice: first with the sentences of length up to 30 words (RNNencdec-30, RNNsearch-30) and then with the sentences of length up to 50 word (RNNencdec-50, RNNsearch-50).
+
+The encoder and decoder of the RNNencdec have 1000 hidden units each.<sup>7</sup> The encoder of the RNNsearch consist
